@@ -57,7 +57,7 @@ public class Graph
     {
           try {
         	  // Need to improve that can get current file of App and read graph txt
-        	  File graphFile = new File("C:\\Users\\Admin\\eclipse-workspace\\flowgraph\\src\\main\\java\\bobo4\\flowgraph\\graph.txt");
+        	  File graphFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\graph.txt");
         	  // Open file to read by scanner
         	  Scanner fileReader = new Scanner(graphFile);
 			
@@ -186,7 +186,7 @@ public class Graph
         
         // Render into JPG b mxCellRender
         BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
-        File imgFile = new File("C:\\Users\\Admin\\eclipse-workspace\\flowgraph\\src\\main\\java\\bobo4\\flowgraph\\graph.jpg");
+        File imgFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\graph.jpg");
         try {
 			ImageIO.write(image, "JPG", imgFile);
 		} catch (IOException e) {
