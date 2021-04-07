@@ -8,8 +8,16 @@ import javax.swing.JOptionPane;
 
 public class FindPath {
 	private ListenableGraph<String, FlowEdge> graph;
-	List<GraphPath<String, FlowEdge>> listPath = new ArrayList<GraphPath<String,FlowEdge>>();
+	private List<GraphPath<String, FlowEdge>> listPath = new ArrayList<GraphPath<String,FlowEdge>>();
 	
+	public List<GraphPath<String, FlowEdge>> getListPath() {
+		return listPath;
+	}
+
+	public void setListPath(List<GraphPath<String, FlowEdge>> listPath) {
+		this.listPath = listPath;
+	}
+
 	public FindPath(ListenableGraph<String, FlowEdge> graph)
 	{
 		this.graph = graph;
@@ -33,16 +41,25 @@ public class FindPath {
 	public void print()
 	{
 		String[] strPath = new String[listPath.size()];
-		for (int i = 0; i < strPath.length; i++) strPath[i] = "";
-		for (int i = 0; i < listPath.size(); i++)
+		
+		if (listPath.size() == 0)
 		{
-			strPath[i] += "1";
-			for (FlowEdge edge : listPath.get(i).getEdgeList())
-			{
-				strPath[i] += " => " + edge.getTarget();
-			}
+			
 		}
-		String strPrint = String.join("\n", strPath);
-		JOptionPane.showMessageDialog(null, strPrint, "All Path", JOptionPane.INFORMATION_MESSAGE);
+		else
+		{
+			for (int i = 0; i < strPath.length; i++) strPath[i] = "";
+			for (int i = 0; i < listPath.size(); i++)
+			{
+				strPath[i] += "1";
+				for (FlowEdge edge : listPath.get(i).getEdgeList())
+				{
+					strPath[i] += " => " + edge.getTarget();
+				}
+			}
+			String strPrint = String.join("\n", strPath);
+			JOptionPane.showMessageDialog(null, strPrint, "All Path", JOptionPane.INFORMATION_MESSAGE);
+			
+		}
 	}
 }
