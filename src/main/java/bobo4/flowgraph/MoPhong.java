@@ -20,7 +20,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
-public class IllustratePath extends JApplet {
+public class MoPhong extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1080, 720);
 
 	public JFrame frame = new JFrame("Path Demmo");
@@ -74,7 +74,7 @@ public class IllustratePath extends JApplet {
 		}
 	};
 
-	public IllustratePath () {
+	public MoPhong () {
 		// Create a visualization using JGraph, via an adapter
 		jgxAdapter = new JGraphXAdapter<>(graph);
 				
@@ -82,30 +82,6 @@ public class IllustratePath extends JApplet {
 		vertexToCellMap = jgxAdapter.getVertexToCellMap();
 
 	}
-
-	public void printOnePath() throws InterruptedException {
-		IllustratePath applet = new IllustratePath();
-		
-		frame.setTitle("Path Demo");
-		applet.init();
-		frame.getContentPane().add(applet);
-		frame.pack();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		Thread.sleep(1000);
-		
-		int maxElement = path.getVertexList().size() + path.getEdgeList().size();
-		for (; index < maxElement; )
-		{
-			applet.repaint();
-			frame.pack();
-			Thread.sleep(500);
-		}
-		frame.setVisible(true);
-		
-		applet.destroy();
-	}
-
 	
 	@Override
 	public void init() {
@@ -177,8 +153,7 @@ public class IllustratePath extends JApplet {
 		
 	}
 	
-	@Override
-	public void repaint() {
+	public void repaint(String g) {
 		// TODO Auto-generated method stub
 		super.repaint();
 		setPreferredSize(DEFAULT_SIZE);
