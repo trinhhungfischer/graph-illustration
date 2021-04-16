@@ -14,8 +14,8 @@ public class FlowEdge extends DefaultEdge
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return super.toString();
-//		return "";
+//		return super.toString();
+		return "";
 	}
 	
 	@Override
