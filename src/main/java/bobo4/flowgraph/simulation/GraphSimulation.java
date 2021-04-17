@@ -12,7 +12,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
-import org.jgrapht.Graph;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -27,17 +26,20 @@ import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxStyleUtils;
 
+import bobo4.flowgraph.GraphData;
 import bobo4.flowgraph.JGraphtGraph;
 
 /***
- * jgxAdapter: This is a Graph Adapter to connect between JGrgaphT and JFrame use print graph
+ * jgxAdapter: This is a Graph Adapter to connect between JGrgaphT and JFrame
+ * use print graph
+ * 
  * @author kudos
  *
  */
-public class GraphSimulation extends JApplet{
+public class GraphSimulation extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1920, 1080);
 	public JFrame frame;
-	private JGraphXAdapter<Integer, DefaultWeightedEdge> jgxAdapter;
+	private JGraphXAdapter<String, DefaultWeightedEdge> jgxAdapter;
 	private mxGraphComponent component;
 
 	// All attribute of the vertex style you can declare in this hashmap
@@ -56,29 +58,16 @@ public class GraphSimulation extends JApplet{
 //			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
 		}
 	};
-	
-	public GraphSimulation(Graph graphData) {
+
+	public GraphSimulation(GraphData graphData) {
 		JGraphtGraph jGraphtGraph = new JGraphtGraph(graphData);
-	}
-	
-	public void simulate(JGraphtGraph jGraphtGraph) {
-		this.frame = new JFrame();
-		
-		Graph applet = new Graph();
-		applet.init();
-		
-		frame.getContentPane().add(applet);
-		frame.setTitle("Flow Graph Demo");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
+		jgxAdapter = new JGraphXAdapter<>(jGraphtGraph.getGraph());
+		init();
 	}
 
-	@Override
 	public void init() {
 		// Create a visualization using JGraph, via an adapter
-		jgxAdapter = new JGraphXAdapter<>(graph);
-			
+
 		setPreferredSize(DEFAULT_SIZE);
 
 		component = new mxGraphComponent(jgxAdapter);
@@ -111,13 +100,13 @@ public class GraphSimulation extends JApplet{
 			for (Map.Entry<Object, Object> e : vertexStyle.entrySet()) {
 				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
-			
+
 			// Modify the edge now
 			jgxAdapter.clearSelection();
-	
+
 			jgxAdapter.selectEdges();
 			cells = jgxAdapter.getSelectionCells();
-			
+
 			for (Map.Entry<Object, Object> e : edgeStyle.entrySet()) {
 				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
@@ -125,7 +114,6 @@ public class GraphSimulation extends JApplet{
 			jgxAdapter.clearSelection();
 			jgxAdapter.getModel().endUpdate();
 		}
-		
 
 		// Positioning via jGraphX layouts
 		mxCircleLayout layout = new mxCircleLayout(jgxAdapter);
@@ -152,13 +140,6 @@ public class GraphSimulation extends JApplet{
 		}
 	}
 
-	public JFrame getFrame() {
-		return frame;
-	}
-
-	public void setFrame(JFrame frame) {
-		this.frame = frame;
-	}
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub

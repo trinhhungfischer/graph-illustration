@@ -3,11 +3,11 @@ package bobo4.flowgraph;
 import java.util.ArrayList;
 
 public class NodeGraph {
-	int id;
+	String id;
 	private ArrayList<NodeGraph> nextNodeList;
 	private ArrayList<Integer> lengthEdgeList;
 	
-	public NodeGraph(int id) {
+	public NodeGraph(String id) {
 		this.id = id;
 		this.nextNodeList = new ArrayList<>();
 		this.lengthEdgeList = new ArrayList<>();
@@ -26,7 +26,7 @@ public class NodeGraph {
 		return this.lengthEdgeList;
 	}
 	
-	public int getId() {
+	public String getId() {
 		return this.id;
 	}
 }
