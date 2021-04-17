@@ -37,7 +37,7 @@ import bobo4.flowgraph.JGraphtGraph;
  *
  */
 public class GraphSimulation extends JApplet {
-	private static final Dimension DEFAULT_SIZE = new Dimension(1920, 1080);
+	private static final Dimension DEFAULT_SIZE = new Dimension(1130, 640);
 	public JFrame frame;
 	private JGraphXAdapter<String, DefaultWeightedEdge> jgxAdapter;
 	private mxGraphComponent component;
