@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
@@ -36,9 +37,8 @@ import bobo4.flowgraph.JGraphtGraph;
  * @author kudos
  *
  */
-public class GraphSimulation extends JApplet {
-	private static final Dimension DEFAULT_SIZE = new Dimension(1130, 640);
-	public JFrame frame;
+public class GraphSimulation extends JPanel {
+	private static final Dimension DEFAULT_SIZE = new Dimension(2000, 1000);
 	private JGraphXAdapter<String, DefaultWeightedEdge> jgxAdapter;
 	private mxGraphComponent component;
 
@@ -67,14 +67,12 @@ public class GraphSimulation extends JApplet {
 
 	public void init() {
 		// Create a visualization using JGraph, via an adapter
-
 		setPreferredSize(DEFAULT_SIZE);
 
 		component = new mxGraphComponent(jgxAdapter);
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
-		getContentPane().add(component);
-		resize(DEFAULT_SIZE);
+		add(component);
 
 		jgxAdapter.getModel().beginUpdate();
 		try {
@@ -138,11 +136,5 @@ public class GraphSimulation extends JApplet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		super.destroy();
 	}
 }
