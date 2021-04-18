@@ -49,4 +49,8 @@ public class GraphData {
 	public HashMap<String, NodeGraph> getNodeList(){
 		return this.nodeList;
 	}
+	
+	public NodeGraph getNodeById(String nodeId) {
+		return nodeList.get(nodeId);
+	}
 }

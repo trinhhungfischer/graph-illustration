@@ -1,4 +1,4 @@
-package bobo4.flowgraph.simulation;
+package bobo4.flowgraph.simulation.graphSimulation;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,6 +41,7 @@ public class GraphSimulation extends JPanel {
 	private static final Dimension DEFAULT_SIZE = new Dimension(2000, 1000);
 	private JGraphXAdapter<String, DefaultWeightedEdge> jgxAdapter;
 	private mxGraphComponent component;
+	private GraphData graphData;
 
 	// All attribute of the vertex style you can declare in this hashmap
 	private Map<Object, Object> vertexStyle = new HashMap<Object, Object>() {
@@ -60,6 +61,7 @@ public class GraphSimulation extends JPanel {
 	};
 
 	public GraphSimulation(GraphData graphData) {
+		this.graphData = graphData;
 		JGraphtGraph jGraphtGraph = new JGraphtGraph(graphData);
 		jgxAdapter = new JGraphXAdapter<>(jGraphtGraph.getGraph());
 		init();
@@ -136,5 +138,9 @@ public class GraphSimulation extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public GraphData getGraphData() {
+		return graphData;
 	}
 }

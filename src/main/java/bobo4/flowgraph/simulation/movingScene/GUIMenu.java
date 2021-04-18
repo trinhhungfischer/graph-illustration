@@ -11,30 +11,38 @@ import javax.swing.JTextField;
 public class GUIMenu extends JPanel{
 	private JButton buttonLego;
 	private JButton buttonReset;
+	private JButton buttonNext;
 	private JTextField startPointText;
 	private JTextField endPointText;
-	public GUIMenu() {
+	private GUIMoving guiMoving;
+	public GUIMenu(GUIMoving guiMoving) {
+		this.guiMoving = guiMoving;
 		initStartPoint();
 		initEndPoint();
+		initButtonNext();
 		initButtonLego();
 		initButtonReset();
 	}
 	
 	private void initButtonLego() {
-		buttonLego = new JButton("LET'S GO");
-		buttonLego.setEnabled(true);
-		buttonLego.setBounds(100,100,95,30);  
-		buttonLego.addActionListener(new ActionListener() {
+		ActionListener action =  new ActionListener() {
 			public void actionPerformed(ActionEvent e){  
 				buttonLego.setEnabled(false);
 				startPointText.setEnabled(false);
 				endPointText.setEnabled(false);
+				buttonNext.setEnabled(true);
+				startMove();
 	        }  
-		});
+		};
+		
+		buttonLego = new JButton("LET'S GO");
+		buttonLego.setEnabled(true);
+		buttonLego.setBounds(100,100,95,30);  
+		buttonLego.addActionListener(action);
 		
 		add(buttonLego);
 	}
-	
+
 	private void initButtonReset() {
 		buttonReset = new JButton("RESET");
 		buttonReset.setEnabled(true);
@@ -44,10 +52,27 @@ public class GUIMenu extends JPanel{
 				buttonLego.setEnabled(true);
 				startPointText.setEnabled(true);
 				endPointText.setEnabled(true);
+				buttonNext.setEnabled(false);
+				reset();
 	        }  
 		});
 		
 		add(buttonReset);
+	}
+	
+	private void initButtonNext() {
+		ActionListener action =  new ActionListener() {
+			public void actionPerformed(ActionEvent e){  
+				nextMove();
+	        }  
+		};
+		
+		buttonNext = new JButton("NEXT");
+		buttonNext.setEnabled(false);
+		buttonNext.setBounds(50,100,95,30);  
+		buttonNext.addActionListener(action);
+		
+		add(buttonNext);
 	}
 	
 	private void initStartPoint() {
@@ -62,5 +87,17 @@ public class GUIMenu extends JPanel{
 		add(label);
 		endPointText = new JTextField(9);
 		add(endPointText);
+	}
+	
+	private void startMove() {
+		guiMoving.startMove(startPointText.getText(), endPointText.getText());
+	}
+	
+	private void nextMove() {
+		guiMoving.nextMove();
+	}
+	
+	private void reset() {
+		guiMoving.reset();
 	}
 }
