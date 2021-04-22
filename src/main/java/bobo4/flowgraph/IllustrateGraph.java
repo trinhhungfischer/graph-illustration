@@ -207,6 +207,7 @@ public class IllustrateGraph extends JApplet {
 	public void zoomIn()
 	{
 		component.zoomIn();
+		component.zoomAndCenter();;
 	}
 	
 	public void zoomOut()

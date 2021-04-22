@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.*;
 import java.awt.Window.Type;
 import javax.swing.border.CompoundBorder;
+import javax.swing.text.BadLocationException;
 import javax.swing.border.BevelBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,6 +29,36 @@ public class GraphFrame extends JFrame {
 		graphIllustrate.setBounds(328, 11, 1146, 720);
 		graphIllustrate.init();
 		getContentPane().setLayout(null);
+
+		JButton btnZOOMOUT = new JButton();
+		btnZOOMOUT.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				graphIllustrate.zoomOut();
+			}
+		});
+		ImageIcon zoomOut = new ImageIcon(GraphFrame.class.getResource("/bobo4/flowgraph/asset/zoom-out.png"));
+		Image image = zoomOut.getImage();
+		Image newImg = image.getScaledInstance(btnZOOMOUT.WIDTH * 30, btnZOOMOUT.HEIGHT * 20,
+				java.awt.Image.SCALE_SMOOTH);
+		zoomOut = new ImageIcon(newImg);
+		btnZOOMOUT.setIcon(zoomOut);
+		btnZOOMOUT.setBounds(1409, 85, 46, 46);
+
+		JButton btnZOOMIN = new JButton();
+		btnZOOMIN.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				graphIllustrate.zoomIn();
+			}
+		});
+		image = new ImageIcon(GraphFrame.class.getResource("/bobo4/flowgraph/asset/zoom-in.png")).getImage();
+		newImg = image.getScaledInstance(btnZOOMIN.WIDTH * 30, btnZOOMIN.HEIGHT * 20, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon zoomIn = new ImageIcon(newImg);
+		btnZOOMIN.setIcon(zoomIn);
+		btnZOOMIN.setBounds(1409, 29, 46, 46);
+		getContentPane().add(btnZOOMIN);
+		getContentPane().add(btnZOOMOUT);
 
 		getContentPane().add(graphIllustrate);
 
@@ -51,7 +82,8 @@ public class GraphFrame extends JFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String nodeStart = JOptionPane.showInputDialog(null, "Fuck", "Fuck", JOptionPane.QUESTION_MESSAGE);
+				String nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
+						JOptionPane.QUESTION_MESSAGE);
 				graphIllustrate.paintNode(nodeStart, 0);
 				PathHistory.add(nodeStart);
 			}
@@ -59,7 +91,8 @@ public class GraphFrame extends JFrame {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				if (numEnter == 0)
-					JOptionPane.showMessageDialog(btnSTART, "Fuck", "Fuck", JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(btnSTART, "Input your start node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
 				numEnter++;
 			}
 		});
@@ -80,6 +113,8 @@ public class GraphFrame extends JFrame {
 					else {
 						int i = new Random().nextInt(vtarget.size());
 						String vnext = vtarget.get(i);
+						txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => "
+								+ vnext + "\n");
 						PathHistory.add(vnext);
 						graphIllustrate.paintNode(vnext, 0);
 					}
@@ -92,18 +127,31 @@ public class GraphFrame extends JFrame {
 		btnNEXT.setBounds(598, 11, 125, 75);
 		panelButton.add(btnNEXT);
 
-		JButton btnBACK = new JButton("BACK");
+		final JButton btnBACK = new JButton("BACK");
 		btnBACK.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				graphIllustrate.paintNode(PathHistory.get(PathHistory.size() - 1), 1);
-				PathHistory.remove(PathHistory.size() - 1);
+				if (PathHistory.size() > 0) {
+					graphIllustrate.paintNode(PathHistory.get(PathHistory.size() - 1), 1);
+					PathHistory.remove(PathHistory.size() - 1);
+					int line = PathHistory.size() - 1;
+					if (line >= 0)
+						try {
+							txtPATHLOG.replaceRange(null, txtPATHLOG.getLineStartOffset(line),
+									txtPATHLOG.getLineEndOffset(line));
+						} catch (BadLocationException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				} else {
+					JOptionPane.showMessageDialog(btnBACK, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		btnBACK.setBounds(788, 11, 125, 75);
 		panelButton.add(btnBACK);
 
-		JButton btnLIST = new JButton("LIST NEXT");
+		final JButton btnLIST = new JButton("LIST NEXT");
 		btnLIST.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -123,7 +171,7 @@ public class GraphFrame extends JFrame {
 						graphIllustrate.paintNode(vnext, 0);
 					}
 				} else
-					JOptionPane.showMessageDialog(btnNEXT, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(btnLIST, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			}
 		});
@@ -136,6 +184,13 @@ public class GraphFrame extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				graphIllustrate.init();
 				PathHistory.clear();
+				try {
+					txtPATHLOG.replaceRange(null, txtPATHLOG.getLineStartOffset(0),
+							txtPATHLOG.getLineEndOffset(txtPATHLOG.getLineCount() - 1));
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 
