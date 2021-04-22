@@ -12,12 +12,12 @@ import javax.swing.border.BevelBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class GraphFrame extends JFrame {
+public class GraphIllustrate extends JFrame {
 	private JTextArea txtPATHLOG;
 
 	private List<String> PathHistory = new ArrayList<>();
 
-	public GraphFrame() {
+	public GraphIllustrate() {
 		setTitle("Graph Path Demo");
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
@@ -25,7 +25,7 @@ public class GraphFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1500, 900);
 
-		final IllustrateGraph graphIllustrate = new IllustrateGraph();
+		final Graph graphIllustrate = new Graph();
 		graphIllustrate.setBounds(328, 11, 1146, 720);
 		graphIllustrate.init();
 		getContentPane().setLayout(null);
@@ -37,7 +37,7 @@ public class GraphFrame extends JFrame {
 				graphIllustrate.zoomOut();
 			}
 		});
-		ImageIcon zoomOut = new ImageIcon(GraphFrame.class.getResource("/bobo4/flowgraph/asset/zoom-out.png"));
+		ImageIcon zoomOut = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/zoom-out.png"));
 		Image image = zoomOut.getImage();
 		Image newImg = image.getScaledInstance(btnZOOMOUT.WIDTH * 30, btnZOOMOUT.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
@@ -52,7 +52,7 @@ public class GraphFrame extends JFrame {
 				graphIllustrate.zoomIn();
 			}
 		});
-		image = new ImageIcon(GraphFrame.class.getResource("/bobo4/flowgraph/asset/zoom-in.png")).getImage();
+		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/zoom-in.png")).getImage();
 		newImg = image.getScaledInstance(btnZOOMIN.WIDTH * 30, btnZOOMIN.HEIGHT * 20, java.awt.Image.SCALE_SMOOTH);
 		ImageIcon zoomIn = new ImageIcon(newImg);
 		btnZOOMIN.setIcon(zoomIn);
@@ -71,6 +71,7 @@ public class GraphFrame extends JFrame {
 		btnEND.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				setVisible(false);
 			}
 		});
 		btnEND.setBounds(218, 11, 125, 75);
@@ -223,7 +224,7 @@ public class GraphFrame extends JFrame {
 
 	public static void main(String[] args) {
 		try {
-			GraphFrame hung = new GraphFrame();
+			GraphIllustrate hung = new GraphIllustrate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
