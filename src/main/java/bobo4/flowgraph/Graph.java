@@ -23,7 +23,8 @@ public class Graph extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1920, 1080);
 
 	public JFrame frame = new JFrame();
-	// This is a Graph Adapter to connect between JGrgaphT and JFrame use print graph
+	// This is a Graph Adapter to connect between JGrgaphT and JFrame use print
+	// graph
 	private JGraphXAdapter<String, FlowEdge> jgxAdapter;
 
 	private static ListenableGraph<String, FlowEdge> graph = new DefaultListenableGraph<>(
@@ -36,7 +37,7 @@ public class Graph extends JApplet {
 	public void setGraph(ListenableGraph<String, FlowEdge> graph) {
 		this.graph = graph;
 	}
-	
+
 	private mxGraphComponent component;
 
 	// All attribute of the vertex style you can declare in this hashmap
@@ -52,7 +53,7 @@ public class Graph extends JApplet {
 	// All attribute of the edge style you can declare in this hashmap
 	private Map<Object, Object> edgeStyle = new HashMap<Object, Object>() {
 		{
-//			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
+			// put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
 		}
 	};
 
@@ -86,7 +87,7 @@ public class Graph extends JApplet {
 
 		Graph applet = new Graph();
 		applet.init();
-		
+
 		frame.getContentPane().add(applet);
 		frame.setTitle("Flow Graph Demo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -98,7 +99,7 @@ public class Graph extends JApplet {
 	public void init() {
 		// Create a visualization using JGraph, via an adapter
 		jgxAdapter = new JGraphXAdapter<>(graph);
-			
+
 		setPreferredSize(DEFAULT_SIZE);
 
 		component = new mxGraphComponent(jgxAdapter);
@@ -131,13 +132,13 @@ public class Graph extends JApplet {
 			for (Map.Entry<Object, Object> e : vertexStyle.entrySet()) {
 				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
-			
+
 			// Modify the edge now
 			jgxAdapter.clearSelection();
-	
+
 			jgxAdapter.selectEdges();
 			cells = jgxAdapter.getSelectionCells();
-			
+
 			for (Map.Entry<Object, Object> e : edgeStyle.entrySet()) {
 				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
@@ -145,11 +146,10 @@ public class Graph extends JApplet {
 			jgxAdapter.clearSelection();
 			jgxAdapter.getModel().endUpdate();
 		}
-		
 
 		// Positioning via jGraphX layouts
 		mxCircleLayout layout = new mxCircleLayout(jgxAdapter);
-//		layout.setDisableEdgeStyle(true);
+		// layout.setDisableEdgeStyle(true);
 
 		// Center the circle
 		int radius = 300;
@@ -179,6 +179,7 @@ public class Graph extends JApplet {
 	public void setFrame(JFrame frame) {
 		this.frame = frame;
 	}
+
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub

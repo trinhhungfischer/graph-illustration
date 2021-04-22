@@ -20,7 +20,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
-public class MoPhong extends JApplet {
+public class IllustrateGraph extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1080, 720);
 
 	public JFrame frame = new JFrame("Path Demmo");
@@ -74,25 +74,24 @@ public class MoPhong extends JApplet {
 		}
 	};
 
-	public MoPhong () {
+	public IllustrateGraph () {
 		// Create a visualization using JGraph, via an adapter
 		jgxAdapter = new JGraphXAdapter<>(graph);
 				
 		edgeToCellMap = jgxAdapter.getEdgeToCellMap();
 		vertexToCellMap = jgxAdapter.getVertexToCellMap();
-
-	}
-	
-	@Override
-	public void init() {
+		
 		setPreferredSize(DEFAULT_SIZE);
 		// TODO Auto-generated method stub
 		component = new mxGraphComponent(jgxAdapter);
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
 		getContentPane().add(component);
-		resize(DEFAULT_SIZE);
 
+	}
+	
+	@Override
+	public void init() {
 		jgxAdapter.getModel().beginUpdate();
 		try {
 			jgxAdapter.clearSelection();
@@ -153,51 +152,65 @@ public class MoPhong extends JApplet {
 		
 	}
 	
-	public void repaint(String g) {
+	public void paintNode(String node, int mode) {
 		// TODO Auto-generated method stub
-		super.repaint();
-		setPreferredSize(DEFAULT_SIZE);
-		// TODO Auto-generated method stub
-		component = new mxGraphComponent(jgxAdapter);
-		component.setConnectable(false);
-		component.getGraph().setAllowDanglingEdges(false);
-		getContentPane().add(component);
-		
 
 		jgxAdapter.getModel().beginUpdate();
 		try {
 			Object[] cells;
 			Object[] vertexList = new Object[1];
-			Object[] edgeList = new Object[1];
 			
 
-			if ((index % 2) == 0)
-				{
-					Object cell = (Object)vertexToCellMap.get(path.getVertexList().get(this.index / 2));
-					vertexList[0] = cell;
-				} 
-			else {
-				Object cell = (Object)edgeToCellMap.get(path.getEdgeList().get(this.index / 2));
-				edgeList[0] = cell;
-			}
+			Object cell = (Object)vertexToCellMap.get(node);
+			vertexList[0] = cell;
+			
 			jgxAdapter.clearSelection();
 			jgxAdapter.setSelectionCells(vertexList);
 			cells = jgxAdapter.getSelectionCells();
-			for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
-				new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+			switch (mode)
+			{
+			case 0:
+			{
+				for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
+					new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				}
+				break;
+			}
+			case 1:
+			{
+				for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
+					new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				}
+			}
 			}
 			
-			jgxAdapter.clearSelection();
-			jgxAdapter.setSelectionCells(edgeList);
-			cells = jgxAdapter.getSelectionCells();
-			for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
-				new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
-			}
-		
+			
 		} finally {
 			jgxAdapter.clearSelection();
 			jgxAdapter.getModel().endUpdate();
-			this.index ++;
 		}
+	}
+	
+	
+	public List<String> getNextVertex(String currentVertex)
+	{
+		List<String> listNode = new ArrayList<>();
+		for (FlowEdge edge: graph.outgoingEdgesOf(currentVertex))
+		{
+			listNode.add((String)edge.getTarget());
+		}
+		
+		return listNode;
+	}
+	
+	
+	public void zoomIn()
+	{
+		component.zoomIn();
+	}
+	
+	public void zoomOut()
+	{
+		component.zoomOut();
 	}
 }

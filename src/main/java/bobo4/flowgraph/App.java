@@ -13,6 +13,5 @@ public class App {
 		dog.print();
 		hung.getFrame().setVisible(false);
 		
-		new IllustratePath().printOnePath();
 	}
 }
