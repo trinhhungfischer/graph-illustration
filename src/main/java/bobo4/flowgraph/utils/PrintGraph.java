@@ -1,9 +1,12 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.utils;
 
 import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.*;
+
+import bobo4.flowgraph.elements.Graph;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -43,9 +46,5 @@ public class PrintGraph extends JFrame {
 		
 		
 		setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		PrintGraph print = new PrintGraph();
 	}
 }

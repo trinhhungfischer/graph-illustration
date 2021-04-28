@@ -1,4 +1,4 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.elements;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +19,8 @@ import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
 
 import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxFastOrganicLayout;
+import com.mxgraph.layout.mxOrganicLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -26,6 +28,10 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxStyleUtils;
+import com.mxgraph.view.mxGraph;
+
+import bobo4.flowgraph.readgraph.ReadGraph;
+import bobo4.flowgraph.utils.FindPath;
 
 public class Graph extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1080, 720);
@@ -36,11 +42,6 @@ public class Graph extends JApplet {
 	public JGraphXAdapter<String, FlowEdge> jgxAdapter;
 
 	private ListenableGraph<String, FlowEdge> graph = new ReadGraph().getGraph();
-
-	private List<GraphPath<String, FlowEdge>> graphPath = new FindPath(this.graph).getListPath();
-
-	private GraphPath<String, FlowEdge> path = graphPath.get(0);
-	private static int index = 0;
 
 	private mxGraphComponent component;
 
@@ -60,7 +61,7 @@ public class Graph extends JApplet {
 	// All attribute of the edge style you can declare in this hashmap
 	private Map<Object, Object> edgeDefaultStyle = new HashMap<Object, Object>() {
 		{
-//			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
+			put(mxConstants.STYLE_STROKECOLOR, "000000");
 		}
 	};
 
@@ -117,8 +118,8 @@ public class Graph extends JApplet {
 				mxCell cell = (mxCell) c;
 				mxGeometry geometry = cell.getGeometry();
 				if (cell.isVertex()) {
-					geometry.setWidth(50); // This is size of Circle
-					geometry.setHeight(50); // This is size of other radius Circle
+					geometry.setWidth(40); // This is size of Circle
+					geometry.setHeight(40); // This is size of other radius Circle
 				}
 			}
 			for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
@@ -140,19 +141,14 @@ public class Graph extends JApplet {
 			jgxAdapter.getModel().endUpdate();
 		}
 
-		// Positioning via jGraphX layouts
-		mxCircleLayout layout = new mxCircleLayout(jgxAdapter);
-		layout.setDisableEdgeStyle(true);
-
-		// Center the circle
-		int radius = 300;
-		layout.setX0((DEFAULT_SIZE.width / 2.0) - radius);
-		layout.setY0((DEFAULT_SIZE.height / 2.0) - radius);
-		layout.setRadius(radius);
-		layout.setMoveCircle(true);
-		layout.setDisableEdgeStyle(false);
-
+		mxFastOrganicLayout layout = new mxFastOrganicLayout(jgxAdapter);		
+		layout.setMaxDistanceLimit(200.0f);
+		layout.setMinDistanceLimit(2f);		
+		layout.setInitialTemp(200f);
+		layout.setMaxIterations(2000);
 		layout.execute(jgxAdapter.getDefaultParent());
+		
+		
 	}
 
 	public void paintNode(String node, int mode) {
@@ -172,14 +168,16 @@ public class Graph extends JApplet {
 			switch (mode) {
 			case 0: {
 				for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
-					new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+					new mxStyleUtils();
+					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
 							e.getValue().toString());
 				}
 				break;
 			}
 			case 1: {
 				for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
-					new mxStyleUtils().setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+					new mxStyleUtils();
+					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
 							e.getValue().toString());
 				}
 			}
@@ -191,6 +189,44 @@ public class Graph extends JApplet {
 		}
 	}
 
+	public void paintEdge(String startVertex,String targetVertex, int mode) {
+		// TODO Auto-generated method stub
+
+		jgxAdapter.getModel().beginUpdate();
+		try {
+			Object[] cells;
+			Object[] edgeList = new Object[1];
+
+			Object cell = (Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex));
+			edgeList[0] = cell;
+
+			jgxAdapter.clearSelection();
+			jgxAdapter.setSelectionCells(edgeList);
+			cells = jgxAdapter.getSelectionCells();
+			switch (mode) {
+			case 0: {
+				for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
+					new mxStyleUtils();
+					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+							e.getValue().toString());
+				}
+				break;
+			}
+			case 1: {
+				for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
+					new mxStyleUtils();
+					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+							e.getValue().toString());
+				}
+			}
+			}
+
+		} finally {
+			jgxAdapter.clearSelection();
+			jgxAdapter.getModel().endUpdate();
+		}
+	}
+	
 	public List<String> getNextVertex(String currentVertex) {
 		List<String> listNode = new ArrayList<>();
 		for (FlowEdge edge : graph.outgoingEdgesOf(currentVertex)) {
@@ -201,9 +237,11 @@ public class Graph extends JApplet {
 	}
 
 	public void zoomIn() {
+		component.setCenterZoom(component.isCenterPage());
 		component.zoomIn();
-		component.zoomAndCenter();
-		;
+		Object cell = (Object) vertexToCellMap.get("1");
+		
+		System.out.println(component.isCenterZoom());
 	}
 
 	public void zoomOut() {
@@ -213,7 +251,7 @@ public class Graph extends JApplet {
 	public void saveImage() {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
-		File imgFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\graph.jpg");
+		File imgFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph.jpg");
 		try {
 			ImageIO.write(image, "JPG", imgFile);
 		} catch (IOException e) {

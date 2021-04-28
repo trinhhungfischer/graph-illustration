@@ -1,4 +1,4 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.readgraph;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,11 +9,9 @@ import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultListenableGraph;
 
-public class ReadGraph {
-	// This is a Graph Adapter to connect between JGrgaphT and JFrame use print
-	// graph
-	private JGraphXAdapter<String, FlowEdge> jgxAdapter;
+import bobo4.flowgraph.elements.FlowEdge;
 
+public class ReadGraph {
 	private static ListenableGraph<String, FlowEdge> graph = new DefaultListenableGraph<>(
 			new DefaultDirectedGraph<String, FlowEdge>(FlowEdge.class));
 
@@ -27,8 +25,9 @@ public class ReadGraph {
 
 	public ReadGraph() {
 		try {
+			boolean[] isInGraph = new boolean[300];
 			// Need to improve that can get current file of App and read graph txt
-			File graphFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\graph.txt");
+			File graphFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph.txt");
 			// Open file to read by scanner
 			Scanner fileReader = new Scanner(graphFile);
 
@@ -36,11 +35,14 @@ public class ReadGraph {
 				String data = fileReader.nextLine();
 				String[] verticesList = data.strip().split(" ");
 
-				this.graph.addVertex(verticesList[0]);
-
-				for (int i = 1; i < verticesList.length; i++) {
-					this.graph.addVertex(verticesList[i]);
-					this.graph.addEdge(verticesList[0], verticesList[i]);
+				for (int i = 0; i < verticesList.length; i++) {
+					int c = Integer.parseInt(verticesList[i]);
+					if (isInGraph[c] == false)
+					{
+						this.graph.addVertex(verticesList[i]);
+						isInGraph[c] = true;
+					}
+					if (i >= 1) this.graph.addEdge(verticesList[0], verticesList[i]);
 				}
 			}
 
