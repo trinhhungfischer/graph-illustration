@@ -1,7 +1,11 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.utils;
 
 import org.jgrapht.*;
+import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.*;
+
+import bobo4.flowgraph.elements.FlowEdge;
+
 import java.util.*;
 
 import javax.swing.JOptionPane;
@@ -21,8 +25,12 @@ public class FindPath {
 	public FindPath(ListenableGraph<String, FlowEdge> graph)
 	{
 		this.graph = graph;
-		AllDirectedPaths<String, FlowEdge> allPath = new AllDirectedPaths<>(this.graph);
-		List<GraphPath<String, FlowEdge>> list = allPath.getAllPaths("1", Integer.toString(this.graph.vertexSet().size()), true, null);
+//		AllDirectedPaths<String, FlowEdge> allPath = new AllDirectedPaths<>(this.graph);
+//		List<GraphPath<String, FlowEdge>> list = allPath.getAllPaths("1", Integer.toString(this.graph.vertexSet().size()), true, 200);
+		
+		YenKShortestPath<String, FlowEdge> somePath = new YenKShortestPath<>(this.graph);
+		List<GraphPath<String, FlowEdge>> list = somePath.getPaths("1", Integer.toString(this.graph.vertexSet().size()), 10);
+		
 		for (int i = 0; i < list.size(); i++)
 		{
 			listPath.add(list.get(i));

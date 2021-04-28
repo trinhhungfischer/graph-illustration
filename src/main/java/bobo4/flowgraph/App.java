@@ -1,8 +1,6 @@
 package bobo4.flowgraph;
 
-import java.util.*;
-
-import com.mxgraph.model.mxICell;
+import bobo4.flowgraph.gui.GUImain;
 
 public class App {
 	

@@ -1,4 +1,4 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -14,6 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
+
+import bobo4.flowgraph.readgraph.ReadGraph;
+import bobo4.flowgraph.utils.FindPath;
+import bobo4.flowgraph.utils.GraphIllustrate;
+import bobo4.flowgraph.utils.PrintGraph;
+
 import java.awt.GridLayout;
 
 public class GUImain extends JFrame {

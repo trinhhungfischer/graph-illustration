@@ -1,4 +1,4 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.elements;
 
 import org.jgrapht.graph.*;
 import java.awt.Color;
@@ -25,7 +25,7 @@ public class FlowEdge extends DefaultEdge
 	}
 	
 	@Override
-		protected Object getTarget() {
+	public Object getTarget() {
 			// TODO Auto-generated method stub
 			return super.getTarget();
 		}

@@ -1,4 +1,4 @@
-package bobo4.flowgraph;
+package bobo4.flowgraph.utils;
 
 import java.awt.*;
 import java.util.*;
@@ -8,6 +8,9 @@ import javax.swing.*;
 import java.awt.Window.Type;
 import javax.swing.border.CompoundBorder;
 import javax.swing.text.BadLocationException;
+
+import bobo4.flowgraph.elements.Graph;
+
 import javax.swing.border.BevelBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -17,20 +20,23 @@ public class GraphIllustrate extends JFrame {
 
 	private List<String> PathHistory = new ArrayList<>();
 
+	private final Dimension DEFAULT_SIZE = new Dimension(1500, 900);
+	
 	public GraphIllustrate() {
-		setTitle("Graph Path Demo");
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
 		setTitle("Graph");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1500, 900);
-
+		setSize(DEFAULT_SIZE);
+		
 		final Graph graphIllustrate = new Graph();
 		graphIllustrate.setBounds(328, 11, 1146, 720);
 		graphIllustrate.init();
 		getContentPane().setLayout(null);
 
 		JButton btnZOOMOUT = new JButton();
+		btnZOOMOUT.setBackground(Color.LIGHT_GRAY);
 		btnZOOMOUT.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -46,6 +52,7 @@ public class GraphIllustrate extends JFrame {
 		btnZOOMOUT.setBounds(1409, 85, 46, 46);
 
 		JButton btnZOOMIN = new JButton();
+		btnZOOMIN.setBackground(Color.LIGHT_GRAY);
 		btnZOOMIN.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -57,6 +64,26 @@ public class GraphIllustrate extends JFrame {
 		ImageIcon zoomIn = new ImageIcon(newImg);
 		btnZOOMIN.setIcon(zoomIn);
 		btnZOOMIN.setBounds(1409, 29, 46, 46);
+
+		final int[] isQuestion = { 0 };
+
+		final JButton btnQUESTION = new JButton();
+		btnQUESTION.setBackground(Color.LIGHT_GRAY);
+		btnQUESTION.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				btnQUESTION.setBackground(Color.YELLOW);
+				isQuestion[0] = 1;
+			}
+		});
+
+		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/question.png")).getImage();
+		btnQUESTION.setBounds(1409, 141, 46, 46);
+		newImg = image.getScaledInstance(btnQUESTION.WIDTH * 30, btnQUESTION.HEIGHT * 20, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon Question = new ImageIcon(newImg);
+		btnQUESTION.setIcon(Question);
+
+		getContentPane().add(btnQUESTION);
 		getContentPane().add(btnZOOMIN);
 		getContentPane().add(btnZOOMOUT);
 
@@ -67,11 +94,19 @@ public class GraphIllustrate extends JFrame {
 		getContentPane().add(panelButton);
 		panelButton.setLayout(null);
 
-		JButton btnEND = new JButton("END");
+		final JButton btnEND = new JButton("END");
 		btnEND.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				setVisible(false);
+				// Instruction your user here
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnEND, "End illustration and return main menu", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+				int isQuit = JOptionPane.showConfirmDialog(null, "Are you sure?", "Quit demo", JOptionPane.YES_OPTION);
+				if (isQuit == 0) setVisible(false);
 			}
 		});
 		btnEND.setBounds(218, 11, 125, 75);
@@ -79,22 +114,30 @@ public class GraphIllustrate extends JFrame {
 
 		final JButton btnSTART = new JButton("START");
 		btnSTART.addMouseListener(new MouseAdapter() {
-			int numEnter = 0;
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// Instruction your user here
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnSTART, "Input your start node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+
+				graphIllustrate.init();
+				PathHistory.clear();
+
+				try {
+					txtPATHLOG.replaceRange(null, txtPATHLOG.getLineStartOffset(0),
+							txtPATHLOG.getLineEndOffset(txtPATHLOG.getLineCount() - 1));
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
 						JOptionPane.QUESTION_MESSAGE);
 				graphIllustrate.paintNode(nodeStart, 0);
 				PathHistory.add(nodeStart);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if (numEnter == 0)
-					JOptionPane.showMessageDialog(btnSTART, "Input your start node", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
-				numEnter++;
 			}
 		});
 		btnSTART.setBounds(28, 11, 125, 75);
@@ -104,6 +147,14 @@ public class GraphIllustrate extends JFrame {
 		btnNEXT.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// Instruction your user here
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnNEXT, "Random walk to next node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+
 				if (PathHistory.size() > 0) {
 					String currentVertex = PathHistory.get(PathHistory.size() - 1);
 					List<String> vtarget = graphIllustrate.getNextVertex(currentVertex);
@@ -118,6 +169,7 @@ public class GraphIllustrate extends JFrame {
 								+ vnext + "\n");
 						PathHistory.add(vnext);
 						graphIllustrate.paintNode(vnext, 0);
+						graphIllustrate.paintEdge(currentVertex, vnext, 0);
 					}
 				} else {
 					JOptionPane.showMessageDialog(btnNEXT, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -132,8 +184,19 @@ public class GraphIllustrate extends JFrame {
 		btnBACK.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				// Instruction your user here
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnBACK, "Turn back previous node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+
 				if (PathHistory.size() > 0) {
-					graphIllustrate.paintNode(PathHistory.get(PathHistory.size() - 1), 1);
+					int currentIndex = PathHistory.size() - 1;
+					graphIllustrate.paintNode(PathHistory.get(currentIndex), 1);
+					if (currentIndex > 0)
+						graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), PathHistory.get(currentIndex), 1);
 					PathHistory.remove(PathHistory.size() - 1);
 					int line = PathHistory.size() - 1;
 					if (line >= 0)
@@ -156,6 +219,13 @@ public class GraphIllustrate extends JFrame {
 		btnLIST.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnLIST, "List all next node which can be reached", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+				
 				if (PathHistory.size() > 0) {
 					String currentVertex = PathHistory.get(PathHistory.size() - 1);
 					List<String> vtarget = graphIllustrate.getNextVertex(currentVertex);
@@ -168,8 +238,11 @@ public class GraphIllustrate extends JFrame {
 						String vnext = (String) JOptionPane.showInputDialog(null,
 								"The current vertex: " + currentVertex + "\nThe next vertex :", "Choose next vertex",
 								JOptionPane.INFORMATION_MESSAGE, null, vtarget.toArray(), vtarget.toArray()[0]);
+						txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => "
+								+ vnext + "\n");
 						PathHistory.add(vnext);
 						graphIllustrate.paintNode(vnext, 0);
+						graphIllustrate.paintEdge(currentVertex, vnext, 0);
 					}
 				} else
 					JOptionPane.showMessageDialog(btnLIST, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -179,10 +252,17 @@ public class GraphIllustrate extends JFrame {
 		btnLIST.setBounds(978, 11, 125, 75);
 		panelButton.add(btnLIST);
 
-		JButton btnRESET = new JButton("RESET");
+		final JButton btnRESET = new JButton("RESET");
 		btnRESET.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnRESET, "Reset graph to default state", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+				
 				graphIllustrate.init();
 				PathHistory.clear();
 				try {
