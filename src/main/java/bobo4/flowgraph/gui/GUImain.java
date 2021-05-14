@@ -40,7 +40,6 @@ public class GUImain extends JFrame {
 		splitPane.setDividerLocation(350);
 
 		getContentPane().add(splitPane);
-		this.setVisible(true);
 	}
 
 	private void initGroupInfo() {
@@ -68,6 +67,7 @@ public class GUImain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: add action
 				PrintGraph graph = new PrintGraph();
+				graph.setVisible(true);
 			}
 		};
 
@@ -104,7 +104,8 @@ public class GUImain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: add action
 				try {
-					GraphIllustrate hung = new GraphIllustrate();
+					GraphIllustrate illustration = new GraphIllustrate();
+					illustration.setVisible(true);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -120,7 +121,4 @@ public class GUImain extends JFrame {
 		optionPanel.add(buttonSimulationPath);
 	}
 
-	public static void main(String[] args) {
-		GUImain guiMain = new GUImain();
-	}
 }

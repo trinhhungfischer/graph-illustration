@@ -19,7 +19,7 @@ public class FlowEdge extends DefaultEdge
 	}
 	
 	@Override
-	protected Object getSource() {
+	public Object getSource() {
 		// TODO Auto-generated method stub
 		return super.getSource();
 	}

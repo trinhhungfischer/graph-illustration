@@ -5,6 +5,7 @@ import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.*;
 
 import bobo4.flowgraph.elements.FlowEdge;
+import bobo4.flowgraph.elements.Graph;
 
 import java.util.*;
 
@@ -57,17 +58,33 @@ public class FindPath {
 		else
 		{
 			for (int i = 0; i < strPath.length; i++) strPath[i] = "";
+			Graph myGraph = new Graph();
+			myGraph.init();
 			for (int i = 0; i < listPath.size(); i++)
 			{
 				strPath[i] += "1";
+				myGraph.paintNode("1", 0);
 				for (FlowEdge edge : listPath.get(i).getEdgeList())
 				{
 					strPath[i] += " => " + edge.getTarget();
+					myGraph.paintNode(edge.getTarget().toString(), 0);
+					myGraph.paintEdge(edge.getSource().toString(), edge.getTarget().toString(), 0);
 				}
+				myGraph.saveImage();
+				myGraph.repaintGraph();
 			}
 			String strPrint = String.join("\n", strPath);
 			JOptionPane.showMessageDialog(null, strPrint, "All Path", JOptionPane.INFORMATION_MESSAGE);
 			
 		}
+		for (int i = 0; i < listPath.size(); i++)
+		{
+			
+			for (FlowEdge edge : listPath.get(i).getEdgeList())
+			{
+				strPath[i] += " => " + edge.getTarget();
+			}
+		}
+		
 	}
 }

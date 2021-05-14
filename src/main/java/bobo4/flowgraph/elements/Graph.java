@@ -2,6 +2,7 @@ package bobo4.flowgraph.elements;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,13 @@ import bobo4.flowgraph.readgraph.ReadGraph;
 import bobo4.flowgraph.utils.FindPath;
 
 public class Graph extends JApplet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static int numberImage = 1;
+	
 	private static final Dimension DEFAULT_SIZE = new Dimension(1080, 720);
 
 	public JFrame frame = new JFrame("Path Demmo");
@@ -107,8 +115,6 @@ public class Graph extends JApplet {
 			jgxAdapter.selectAll();
 			Object[] cells = jgxAdapter.getSelectionCells();
 
-			mxStyleUtils myStyle = new mxStyleUtils();
-
 			// Clear all selection before of jGraphXAdpter
 			jgxAdapter.clearSelection();
 
@@ -123,7 +129,8 @@ public class Graph extends JApplet {
 				}
 			}
 			for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
-				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				new mxStyleUtils();
+				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
 
 			// Modify the edge now
@@ -133,7 +140,8 @@ public class Graph extends JApplet {
 			cells = jgxAdapter.getSelectionCells();
 
 			for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
-				myStyle.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				new mxStyleUtils();
+				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
 			}
 
 		} finally {
@@ -147,8 +155,6 @@ public class Graph extends JApplet {
 		layout.setInitialTemp(200f);
 		layout.setMaxIterations(2000);
 		layout.execute(jgxAdapter.getDefaultParent());
-		
-		
 	}
 
 	public void paintNode(String node, int mode) {
@@ -236,22 +242,76 @@ public class Graph extends JApplet {
 		return listNode;
 	}
 
+	public void repaintGraph()
+	{
+		jgxAdapter.getModel().beginUpdate();
+		jgxAdapter.selectAll();
+		Object[] cells = jgxAdapter.getSelectionCells();
+		List<Object> vertexList = new ArrayList<>();
+		List<Object> edgeList = new ArrayList<>();
+				
+		for (Object c : cells)
+		{
+			mxCell cell = (mxCell) c;
+			if (cell.isVertex())
+			{
+				vertexList.add(c);
+			}
+			else if (cell.isEdge())
+			{
+				edgeList.add(c);
+			}
+		}
+		for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
+			new mxStyleUtils();
+			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), vertexList.toArray(), e.getKey().toString(),
+					e.getValue().toString());
+		}
+		
+		for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
+			new mxStyleUtils();
+			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), edgeList.toArray(), e.getKey().toString(),
+					e.getValue().toString());
+		}
+		jgxAdapter.clearSelection();
+		jgxAdapter.getModel().endUpdate();
+		
+	}
+	
 	public void zoomIn() {
 		component.setCenterZoom(component.isCenterPage());
+		
+		int newX = component.getBounds().width;
+		int newY = component.getBounds().height;
+		
 		component.zoomIn();
+		System.out.println(component.getBounds().height);
+		System.out.println(component.getBounds().width);
+		component.getViewport().setViewPosition(new Point(newX, newY));
 		Object cell = (Object) vertexToCellMap.get("1");
 		
-		System.out.println(component.isCenterZoom());
+		component.setCenterZoom(true);
+		
 	}
 
 	public void zoomOut() {
 		component.zoomOut();
+		
+		int newX = component.getBounds().width / 2;
+		int newY = component.getBounds().height / 2;
+		System.out.println(newX);
+		
+		
+		
+		component.getViewport().setViewPosition(new Point(newX, newY));
 	}
 
 	public void saveImage() {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
-		File imgFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph.jpg");
+		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph_"+ numberImage +".jpg";
+		this.numberImage += 1;
+		File imgFile = new File(str);
 		try {
 			ImageIO.write(image, "JPG", imgFile);
 		} catch (IOException e) {

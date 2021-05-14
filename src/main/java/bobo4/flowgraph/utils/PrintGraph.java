@@ -14,13 +14,18 @@ import java.awt.event.MouseEvent;
 
 public class PrintGraph extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PrintGraph() {
 		// TODO Auto-generated constructor stub
 		setTitle("Graph Path Demo");
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
 		setTitle("Graph");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(0, 0, 1920, 1080);
 		
 		final Graph graphIllustrate = new Graph();
@@ -43,8 +48,7 @@ public class PrintGraph extends JFrame {
 		btnRETURN.setBounds(10, 34, 108, 71);
 		getContentPane().add(btnRETURN);
 		getContentPane().add(graphIllustrate);
-		
-		
-		setVisible(true);
 	}
+	
+	
 }

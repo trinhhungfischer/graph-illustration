@@ -16,20 +16,24 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class GraphIllustrate extends JFrame {
-	private JTextArea txtPATHLOG;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private List<String> PathHistory = new ArrayList<>();
 
 	private final Dimension DEFAULT_SIZE = new Dimension(1500, 900);
-	
+	private JTextArea txtPATHLOG;
+
 	public GraphIllustrate() {
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
 		setTitle("Graph");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 1500, 900);
 		setSize(DEFAULT_SIZE);
-		
+
 		final Graph graphIllustrate = new Graph();
 		graphIllustrate.setBounds(328, 11, 1146, 720);
 		graphIllustrate.init();
@@ -94,23 +98,22 @@ public class GraphIllustrate extends JFrame {
 		getContentPane().add(panelButton);
 		panelButton.setLayout(null);
 
-		final JButton btnEND = new JButton("END");
-		btnEND.addMouseListener(new MouseAdapter() {
+		final JButton btnSAVE = new JButton("SAVE");
+		btnSAVE.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// Instruction your user here
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnEND, "End illustration and return main menu", "Instruction",
+					JOptionPane.showMessageDialog(btnSAVE, "Save illustration into jpg file", "Instruction",
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				int isQuit = JOptionPane.showConfirmDialog(null, "Are you sure?", "Quit demo", JOptionPane.YES_OPTION);
-				if (isQuit == 0) setVisible(false);
+				graphIllustrate.saveImage();
 			}
 		});
-		btnEND.setBounds(218, 11, 125, 75);
-		panelButton.add(btnEND);
+		btnSAVE.setBounds(218, 11, 125, 75);
+		panelButton.add(btnSAVE);
 
 		final JButton btnSTART = new JButton("START");
 		btnSTART.addMouseListener(new MouseAdapter() {
@@ -124,7 +127,8 @@ public class GraphIllustrate extends JFrame {
 					isQuestion[0] = 0;
 				}
 
-				graphIllustrate.init();
+				graphIllustrate.repaintGraph();
+				;
 				PathHistory.clear();
 
 				try {
@@ -170,6 +174,7 @@ public class GraphIllustrate extends JFrame {
 						PathHistory.add(vnext);
 						graphIllustrate.paintNode(vnext, 0);
 						graphIllustrate.paintEdge(currentVertex, vnext, 0);
+
 					}
 				} else {
 					JOptionPane.showMessageDialog(btnNEXT, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -182,6 +187,7 @@ public class GraphIllustrate extends JFrame {
 
 		final JButton btnBACK = new JButton("BACK");
 		btnBACK.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// Instruction your user here
@@ -225,7 +231,7 @@ public class GraphIllustrate extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				
+
 				if (PathHistory.size() > 0) {
 					String currentVertex = PathHistory.get(PathHistory.size() - 1);
 					List<String> vtarget = graphIllustrate.getNextVertex(currentVertex);
@@ -262,7 +268,7 @@ public class GraphIllustrate extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				
+
 				graphIllustrate.init();
 				PathHistory.clear();
 				try {
@@ -289,25 +295,18 @@ public class GraphIllustrate extends JFrame {
 		lblPATHLOG.setBounds(10, 7, 286, 72);
 		panelLEFT.add(lblPATHLOG);
 
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 77, 286, 751);
+		panelLEFT.add(scrollPane);
+
 		txtPATHLOG = new JTextArea();
-		txtPATHLOG.setEditable(false);
 		txtPATHLOG.setFont(new Font("Courier New", Font.PLAIN, 14));
-		txtPATHLOG.setBounds(10, 80, 286, 748);
-		panelLEFT.add(txtPATHLOG);
-
-		Scrollbar scrollbar = new Scrollbar();
-		scrollbar.setBounds(279, 85, 17, 743);
-		panelLEFT.add(scrollbar);
-
-		setVisible(true);
+		txtPATHLOG.setEditable(false);
+		scrollPane.setViewportView(txtPATHLOG);
 	}
 
 	public static void main(String[] args) {
-		try {
-			GraphIllustrate hung = new GraphIllustrate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		GraphIllustrate hung = new GraphIllustrate();
+		hung.setVisible(true);
 	}
 }
