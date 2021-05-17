@@ -3,6 +3,12 @@ package bobo4.flowgraph.elements;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +20,8 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.ListenableGraph;
@@ -34,15 +42,15 @@ import com.mxgraph.view.mxGraph;
 import bobo4.flowgraph.readgraph.ReadGraph;
 import bobo4.flowgraph.utils.FindPath;
 
-public class Graph extends JApplet {
+public class Graph extends JScrollPane {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	private static int numberImage = 1;
-	
-	private static final Dimension DEFAULT_SIZE = new Dimension(1080, 720);
+
+	private static final Dimension DEFAULT_SIZE = new Dimension(1190, 750);
 
 	public JFrame frame = new JFrame("Path Demmo");
 	// This is a Graph Adapter to connect between JGrgaphT and JFrame use print
@@ -103,11 +111,15 @@ public class Graph extends JApplet {
 		component = new mxGraphComponent(jgxAdapter);
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
-		getContentPane().add(component);
-
+		
+		add(component);
+		setViewportView(component);
+		setWheelScrollingEnabled(false);
+		component.setWheelScrollingEnabled(false);
+		
+		component.addMouseWheelListener(new MyMouseListener());
 	}
 
-	@Override
 	public void init() {
 		jgxAdapter.getModel().beginUpdate();
 		try {
@@ -130,7 +142,8 @@ public class Graph extends JApplet {
 			}
 			for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
 				new mxStyleUtils();
-				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+						e.getValue().toString());
 			}
 
 			// Modify the edge now
@@ -141,7 +154,8 @@ public class Graph extends JApplet {
 
 			for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
 				new mxStyleUtils();
-				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(), e.getValue().toString());
+				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+						e.getValue().toString());
 			}
 
 		} finally {
@@ -149,9 +163,9 @@ public class Graph extends JApplet {
 			jgxAdapter.getModel().endUpdate();
 		}
 
-		mxFastOrganicLayout layout = new mxFastOrganicLayout(jgxAdapter);		
+		mxFastOrganicLayout layout = new mxFastOrganicLayout(jgxAdapter);
 		layout.setMaxDistanceLimit(200.0f);
-		layout.setMinDistanceLimit(2f);		
+		layout.setMinDistanceLimit(2f);
 		layout.setInitialTemp(200f);
 		layout.setMaxIterations(2000);
 		layout.execute(jgxAdapter.getDefaultParent());
@@ -195,7 +209,7 @@ public class Graph extends JApplet {
 		}
 	}
 
-	public void paintEdge(String startVertex,String targetVertex, int mode) {
+	public void paintEdge(String startVertex, String targetVertex, int mode) {
 		// TODO Auto-generated method stub
 
 		jgxAdapter.getModel().beginUpdate();
@@ -232,7 +246,7 @@ public class Graph extends JApplet {
 			jgxAdapter.getModel().endUpdate();
 		}
 	}
-	
+
 	public List<String> getNextVertex(String currentVertex) {
 		List<String> listNode = new ArrayList<>();
 		for (FlowEdge edge : graph.outgoingEdgesOf(currentVertex)) {
@@ -242,23 +256,18 @@ public class Graph extends JApplet {
 		return listNode;
 	}
 
-	public void repaintGraph()
-	{
+	public void repaintGraph() {
 		jgxAdapter.getModel().beginUpdate();
 		jgxAdapter.selectAll();
 		Object[] cells = jgxAdapter.getSelectionCells();
 		List<Object> vertexList = new ArrayList<>();
 		List<Object> edgeList = new ArrayList<>();
-				
-		for (Object c : cells)
-		{
+
+		for (Object c : cells) {
 			mxCell cell = (mxCell) c;
-			if (cell.isVertex())
-			{
+			if (cell.isVertex()) {
 				vertexList.add(c);
-			}
-			else if (cell.isEdge())
-			{
+			} else if (cell.isEdge()) {
 				edgeList.add(c);
 			}
 		}
@@ -267,7 +276,7 @@ public class Graph extends JApplet {
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), vertexList.toArray(), e.getKey().toString(),
 					e.getValue().toString());
 		}
-		
+
 		for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
 			new mxStyleUtils();
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), edgeList.toArray(), e.getKey().toString(),
@@ -275,41 +284,38 @@ public class Graph extends JApplet {
 		}
 		jgxAdapter.clearSelection();
 		jgxAdapter.getModel().endUpdate();
-		
-	}
-	
-	public void zoomIn() {
-		component.setCenterZoom(component.isCenterPage());
-		
-		int newX = component.getBounds().width;
-		int newY = component.getBounds().height;
-		
-		component.zoomIn();
-		System.out.println(component.getBounds().height);
-		System.out.println(component.getBounds().width);
-		component.getViewport().setViewPosition(new Point(newX, newY));
-		Object cell = (Object) vertexToCellMap.get("1");
-		
-		component.setCenterZoom(true);
-		
+
 	}
 
-	public void zoomOut() {
+	public void zoomIn(int x, int y) {
+		component.setCenterZoom(component.isCenterPage());	
+		double newX = x - component.getViewport().getSize().getWidth() / 2;
+		double newY = y - component.getViewport().getSize().getHeight() / 2;
+
+		Point leftPoint = new Point();
+		leftPoint.setLocation(x, y);
+
+		component.zoomIn();
+		component.scrollRectToVisible(new Rectangle(leftPoint, component.getViewport().getSize()));
+	}
+
+	public void zoomOut(int x, int y) {
+		component.setCenterZoom(component.isCenterPage());
+
+		double newX = x - component.getViewport().getSize().getWidth() / 2;
+		double newY = y - component.getViewport().getSize().getHeight() / 2;
+
+		Point leftPoint = new Point();
+		leftPoint.setLocation(x, y);
+
 		component.zoomOut();
-		
-		int newX = component.getBounds().width / 2;
-		int newY = component.getBounds().height / 2;
-		System.out.println(newX);
-		
-		
-		
-		component.getViewport().setViewPosition(new Point(newX, newY));
+		component.scrollRectToVisible(new Rectangle(leftPoint, component.getViewport().getSize()));
 	}
 
 	public void saveImage() {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
-		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph_"+ numberImage +".jpg";
+		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\images\\graph_" + numberImage + ".jpg";
 		this.numberImage += 1;
 		File imgFile = new File(str);
 		try {
@@ -318,5 +324,103 @@ public class Graph extends JApplet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void paintPath(GraphPath<String, FlowEdge> path) {
+		ArrayList<Object> vertices = new ArrayList<>();
+		ArrayList<Object> edges = new ArrayList<>();
+		
+		for(int i = 0; i < path.getVertexList().size(); i++)
+		{
+			vertices.add(vertexToCellMap.get(path.getVertexList().get(i)));
+		}
+		
+		for(int i = 0; i < path.getEdgeList().size(); i++)
+		{
+			edges.add(edgeToCellMap.get(path.getEdgeList().get(i)));
+		}
+		
+		// Beginning update jgxGraph model here
+		jgxAdapter.getModel().beginUpdate();
+		// Paint Edge here
+		for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
+			new mxStyleUtils();
+			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), edges.toArray(), e.getKey().toString(),
+					e.getValue().toString());
+		}
+		// Paint node here
+		for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
+			new mxStyleUtils();
+			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), vertices.toArray(), e.getKey().toString(),
+					e.getValue().toString());
+		}
+		jgxAdapter.getModel().endUpdate();
+		
+	}
+
+	private class MyMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
+
+		Point startPoint = new Point();
+
+		private float MOVE_SPEED = 1.5f;
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			// TODO Auto-generated method stub
+			if (e.getWheelRotation() > 0)
+				zoomOut(e.getX(), e.getY());
+			else
+				zoomIn(e.getX(), e.getY());
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			// TODO Auto-generated method stub
+			JViewport vport = (JViewport) e.getSource();
+			Point pt = e.getPoint();
+			int dx = startPoint.x - pt.x;
+			int dy = startPoint.y - pt.y;
+			Point vp = vport.getViewPosition();
+			vp.translate(dx, dy);
+			component.scrollRectToVisible(new Rectangle(vp, vport.getSize()));
+			startPoint.setLocation(pt);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			startPoint = e.getPoint();
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 }

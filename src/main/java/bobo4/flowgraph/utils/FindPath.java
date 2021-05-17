@@ -67,9 +67,8 @@ public class FindPath {
 				for (FlowEdge edge : listPath.get(i).getEdgeList())
 				{
 					strPath[i] += " => " + edge.getTarget();
-					myGraph.paintNode(edge.getTarget().toString(), 0);
-					myGraph.paintEdge(edge.getSource().toString(), edge.getTarget().toString(), 0);
 				}
+				myGraph.paintPath(listPath.get(i));
 				myGraph.saveImage();
 				myGraph.repaintGraph();
 			}
