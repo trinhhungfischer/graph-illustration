@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 
@@ -26,10 +27,14 @@ import org.jgrapht.GraphPath;
 
 import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
+import bobo4.flowgraph.exception.WrongVertexException;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import java.awt.Component;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class GraphIllustrate extends JFrame {
 	/**
@@ -139,12 +144,33 @@ public class GraphIllustrate extends JFrame {
 				}
 
 				if (PathHistory.size() > 0) {
-					int currentIndex = PathHistory.size() - 1;
+					int currentIndex = PathHistory.size() - 1; // currentIndex = n - 1;
 					RedoStack.push(PathHistory.get(currentIndex));
-					graphIllustrate.paintNode(PathHistory.get(currentIndex), 1);
-					if (currentIndex > 0)
-						graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), PathHistory.get(currentIndex), 1);
-					PathHistory.remove(PathHistory.size() - 1);
+					String currentNode = PathHistory.get(currentIndex);
+					PathHistory.remove(currentIndex);
+					
+					// Make Path string to string like "123456"
+					String strPath = PathHistory.toString().replaceAll(", |[|]", "");
+
+					// Check the node is in the Path History
+					if (!(strPath.indexOf(currentNode) >= 0)) {
+						try {
+							graphIllustrate.paintNode(currentNode, 1);
+						} catch (WrongVertexException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						if (currentIndex > 0)
+							graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
+					} else {
+						String strEdge = PathHistory.get(currentIndex - 1) + currentNode;
+						if (!(strPath.indexOf(strEdge) >= 0)) {
+							graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
+							System.out.println(strEdge);
+							System.out.println(strPath);
+						}
+					}
+
 					int line = PathHistory.size() - 1;
 					if (line >= 0)
 						try {
@@ -158,6 +184,7 @@ public class GraphIllustrate extends JFrame {
 					JOptionPane.showMessageDialog(btnUNDO, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 		});
 
 		btnUNDO.setBounds(1528, 258, 46, 46);
@@ -165,35 +192,43 @@ public class GraphIllustrate extends JFrame {
 		newImg = image.getScaledInstance(btnQUESTION.WIDTH * 30, btnQUESTION.HEIGHT * 20, java.awt.Image.SCALE_SMOOTH);
 		ImageIcon UndoImage = new ImageIcon(newImg);
 
-		JButton btnREDO = new JButton();
+		final JButton btnREDO = new JButton();
 		btnREDO.setBackground(Color.LIGHT_GRAY);
 		btnUNDO.setIcon(UndoImage);
 		btnREDO.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnUNDO, "Turn back previous node", "Instruction",
+					JOptionPane.showMessageDialog(btnREDO, "Turn back previous node", "Instruction",
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
 				if (RedoStack.size() > 0) {
 					int currentIndex = PathHistory.size() - 1;
 					String newNode = RedoStack.pop();
-					graphIllustrate.paintNode(newNode, 0);
+					try {
+						graphIllustrate.paintNode(newNode, 0);
+					} catch (WrongVertexException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					if (currentIndex >= 0) {
 						graphIllustrate.paintEdge(PathHistory.get(currentIndex), newNode, 1);
 						txtPATHLOG.append(
 								(currentIndex + 1) + ")  " + PathHistory.get(currentIndex) + " => " + newNode + "\n");
+						graphIllustrate.paintEdge(PathHistory.get(currentIndex), newNode, 0);
 					}
 					PathHistory.add(newNode);
 				} else {
-					JOptionPane.showMessageDialog(btnUNDO, "There's no redo node", "Alert", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(btnREDO, "There's no redo node", "Alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 		btnREDO.setBounds(1528, 315, 46, 46);
 		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/redo.png")).getImage();
 		newImg = image.getScaledInstance(btnQUESTION.WIDTH * 30, btnQUESTION.HEIGHT * 20, java.awt.Image.SCALE_SMOOTH);
+
 		ImageIcon RedoImage = new ImageIcon(newImg);
 
 		getContentPane().add(btnREDO);
@@ -224,7 +259,7 @@ public class GraphIllustrate extends JFrame {
 					isQuestion[0] = 0;
 				}
 
-				// Clear all history of before graph
+				// Clear all history of before graph and text Path Log
 				graphIllustrate.repaintGraph();
 				RedoStack.clear();
 				PathHistory.clear();
@@ -236,11 +271,31 @@ public class GraphIllustrate extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				String nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
-						JOptionPane.QUESTION_MESSAGE);
-
-				graphIllustrate.paintNode(nodeStart, 0);
-				PathHistory.add(nodeStart);
+				
+				
+				String nodeStart;
+//				nodeStart = graphIllustrate.cellToVertexMap.get(graphIllustrate.jgxAdapter.getSelectionCell());
+//				graphIllustrate.jgxAdapter.selectAll();
+//				System.out.print(nodeStart);
+				if (!(textField.getText().equals(""))){
+					nodeStart = textField.getText();
+					System.out.print(nodeStart);
+				} else {
+					nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
+							JOptionPane.QUESTION_MESSAGE);
+				}
+				
+				try {
+					graphIllustrate.paintNode(nodeStart, 0);
+					PathHistory.add(nodeStart);
+				} catch (WrongVertexException e1) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(btnSTART, "There's no node in this graph", "Alert",
+							JOptionPane.ERROR_MESSAGE);
+				} catch (Exception e2) {
+					// TODO: handle exception
+					
+				}
 			}
 		});
 		btnSTART.setBounds(28, 20, 100, 41);
@@ -272,7 +327,12 @@ public class GraphIllustrate extends JFrame {
 						txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => "
 								+ vnext + "\n");
 						PathHistory.add(vnext);
-						graphIllustrate.paintNode(vnext, 0);
+						try {
+							graphIllustrate.paintNode(vnext, 0);
+						} catch (WrongVertexException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						graphIllustrate.paintEdge(currentVertex, vnext, 0);
 
 					}
@@ -308,11 +368,20 @@ public class GraphIllustrate extends JFrame {
 						String vnext = (String) JOptionPane.showInputDialog(null,
 								"The current vertex: " + currentVertex + "\nThe next vertex :", "Choose next vertex",
 								JOptionPane.INFORMATION_MESSAGE, null, vtarget.toArray(), vtarget.toArray()[0]);
-						txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => "
-								+ vnext + "\n");
-						PathHistory.add(vnext);
-						graphIllustrate.paintNode(vnext, 0);
-						graphIllustrate.paintEdge(currentVertex, vnext, 0);
+
+						if (vnext != null) {
+							txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1)
+									+ " => " + vnext + "\n");
+							PathHistory.add(vnext);
+							try {
+								graphIllustrate.paintNode(vnext, 0);
+							} catch (WrongVertexException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							graphIllustrate.paintEdge(currentVertex, vnext, 0);
+
+						}
 					}
 				} else
 					JOptionPane.showMessageDialog(btnLIST, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -349,6 +418,14 @@ public class GraphIllustrate extends JFrame {
 		panelButton.add(btnRESET);
 
 		textField = new JTextField();
+		textField.setHorizontalAlignment(SwingConstants.CENTER);
+		textField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				String newnode = textField.getText();
+
+			}
+		});
 		textField.setBounds(138, 20, 91, 41);
 		panelButton.add(textField);
 		textField.setColumns(10);

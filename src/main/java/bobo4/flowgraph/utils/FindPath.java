@@ -6,6 +6,7 @@ import org.jgrapht.alg.shortestpath.*;
 
 import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
+import bobo4.flowgraph.exception.WrongVertexException;
 
 import java.util.*;
 
@@ -63,7 +64,12 @@ public class FindPath {
 			for (int i = 0; i < listPath.size(); i++)
 			{
 				strPath[i] += "1";
-				myGraph.paintNode("1", 0);
+				try {
+					myGraph.paintNode("1", 0);
+				} catch (WrongVertexException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				for (FlowEdge edge : listPath.get(i).getEdgeList())
 				{
 					strPath[i] += " => " + edge.getTarget();

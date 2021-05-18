@@ -39,6 +39,7 @@ import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxStyleUtils;
 import com.mxgraph.view.mxGraph;
 
+import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.readgraph.ReadGraph;
 import bobo4.flowgraph.utils.FindPath;
 
@@ -63,7 +64,9 @@ public class Graph extends JScrollPane {
 
 	private HashMap<FlowEdge, mxICell> edgeToCellMap;
 	private HashMap<String, mxICell> vertexToCellMap;
-
+	public HashMap<mxICell, String> cellToVertexMap;
+	
+	
 	// All attribute of the vertex style you can declare in this hashmap
 	private Map<Object, Object> vertexDefaultStyle = new HashMap<Object, Object>() {
 		{
@@ -105,18 +108,20 @@ public class Graph extends JScrollPane {
 
 		edgeToCellMap = jgxAdapter.getEdgeToCellMap();
 		vertexToCellMap = jgxAdapter.getVertexToCellMap();
-
+		cellToVertexMap = jgxAdapter.getCellToVertexMap();
+		
 		setPreferredSize(DEFAULT_SIZE);
 		// TODO Auto-generated method stub
 		component = new mxGraphComponent(jgxAdapter);
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
-		
+		jgxAdapter.setCellsSelectable(true);
+
 		add(component);
 		setViewportView(component);
 		setWheelScrollingEnabled(false);
 		component.setWheelScrollingEnabled(false);
-		
+
 		component.addMouseWheelListener(new MyMouseListener());
 	}
 
@@ -171,42 +176,45 @@ public class Graph extends JScrollPane {
 		layout.execute(jgxAdapter.getDefaultParent());
 	}
 
-	public void paintNode(String node, int mode) {
+	public void paintNode(String node, int mode) throws WrongVertexException {
 		// TODO Auto-generated method stub
 
 		jgxAdapter.getModel().beginUpdate();
-		try {
-			Object[] cells;
-			Object[] vertexList = new Object[1];
+		if (Integer.parseInt(node) > graph.vertexSet().size())
+			throw new WrongVertexException();
+		else
+			try {
+				Object[] cells;
+				Object[] vertexList = new Object[1];
 
-			Object cell = (Object) vertexToCellMap.get(node);
-			vertexList[0] = cell;
+				Object cell = (Object) vertexToCellMap.get(node);
+				vertexList[0] = cell;
 
-			jgxAdapter.clearSelection();
-			jgxAdapter.setSelectionCells(vertexList);
-			cells = jgxAdapter.getSelectionCells();
-			switch (mode) {
-			case 0: {
-				for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
-					new mxStyleUtils();
-					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-							e.getValue().toString());
+				jgxAdapter.clearSelection();
+				jgxAdapter.setSelectionCells(vertexList);
+				cells = jgxAdapter.getSelectionCells();
+				switch (mode) {
+				case 0: {
+					for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
+						new mxStyleUtils();
+						mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+								e.getValue().toString());
+					}
+					break;
 				}
-				break;
-			}
-			case 1: {
-				for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
-					new mxStyleUtils();
-					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-							e.getValue().toString());
+				case 1: {
+					for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
+						new mxStyleUtils();
+						mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+								e.getValue().toString());
+					}
 				}
-			}
-			}
+				}
 
-		} finally {
-			jgxAdapter.clearSelection();
-			jgxAdapter.getModel().endUpdate();
-		}
+			} finally {
+				jgxAdapter.clearSelection();
+				jgxAdapter.getModel().endUpdate();
+			}
 	}
 
 	public void paintEdge(String startVertex, String targetVertex, int mode) {
@@ -288,7 +296,7 @@ public class Graph extends JScrollPane {
 	}
 
 	public void zoomIn(int x, int y) {
-		component.setCenterZoom(component.isCenterPage());	
+		component.setCenterZoom(component.isCenterPage());
 		double newX = x - component.getViewport().getSize().getWidth() / 2;
 		double newY = y - component.getViewport().getSize().getHeight() / 2;
 
@@ -325,21 +333,19 @@ public class Graph extends JScrollPane {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void paintPath(GraphPath<String, FlowEdge> path) {
 		ArrayList<Object> vertices = new ArrayList<>();
 		ArrayList<Object> edges = new ArrayList<>();
-		
-		for(int i = 0; i < path.getVertexList().size(); i++)
-		{
+
+		for (int i = 0; i < path.getVertexList().size(); i++) {
 			vertices.add(vertexToCellMap.get(path.getVertexList().get(i)));
 		}
-		
-		for(int i = 0; i < path.getEdgeList().size(); i++)
-		{
+
+		for (int i = 0; i < path.getEdgeList().size(); i++) {
 			edges.add(edgeToCellMap.get(path.getEdgeList().get(i)));
 		}
-		
+
 		// Beginning update jgxGraph model here
 		jgxAdapter.getModel().beginUpdate();
 		// Paint Edge here
@@ -355,7 +361,7 @@ public class Graph extends JScrollPane {
 					e.getValue().toString());
 		}
 		jgxAdapter.getModel().endUpdate();
-		
+
 	}
 
 	private class MyMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
