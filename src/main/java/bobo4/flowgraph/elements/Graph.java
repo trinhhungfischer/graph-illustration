@@ -65,8 +65,7 @@ public class Graph extends JScrollPane {
 	private HashMap<FlowEdge, mxICell> edgeToCellMap;
 	private HashMap<String, mxICell> vertexToCellMap;
 	public HashMap<mxICell, String> cellToVertexMap;
-	
-	
+
 	// All attribute of the vertex style you can declare in this hashmap
 	private Map<Object, Object> vertexDefaultStyle = new HashMap<Object, Object>() {
 		{
@@ -109,7 +108,7 @@ public class Graph extends JScrollPane {
 		edgeToCellMap = jgxAdapter.getEdgeToCellMap();
 		vertexToCellMap = jgxAdapter.getVertexToCellMap();
 		cellToVertexMap = jgxAdapter.getCellToVertexMap();
-		
+
 		setPreferredSize(DEFAULT_SIZE);
 		// TODO Auto-generated method stub
 		component = new mxGraphComponent(jgxAdapter);
@@ -180,19 +179,14 @@ public class Graph extends JScrollPane {
 		// TODO Auto-generated method stub
 
 		jgxAdapter.getModel().beginUpdate();
+
 		if (Integer.parseInt(node) > graph.vertexSet().size())
 			throw new WrongVertexException();
 		else
 			try {
-				Object[] cells;
-				Object[] vertexList = new Object[1];
+				
+				Object[] cells = {(Object) vertexToCellMap.get(node)};
 
-				Object cell = (Object) vertexToCellMap.get(node);
-				vertexList[0] = cell;
-
-				jgxAdapter.clearSelection();
-				jgxAdapter.setSelectionCells(vertexList);
-				cells = jgxAdapter.getSelectionCells();
 				switch (mode) {
 				case 0: {
 					for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
@@ -211,6 +205,9 @@ public class Graph extends JScrollPane {
 				}
 				}
 
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
 			} finally {
 				jgxAdapter.clearSelection();
 				jgxAdapter.getModel().endUpdate();
@@ -222,15 +219,7 @@ public class Graph extends JScrollPane {
 
 		jgxAdapter.getModel().beginUpdate();
 		try {
-			Object[] cells;
-			Object[] edgeList = new Object[1];
-
-			Object cell = (Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex));
-			edgeList[0] = cell;
-
-			jgxAdapter.clearSelection();
-			jgxAdapter.setSelectionCells(edgeList);
-			cells = jgxAdapter.getSelectionCells();
+			Object[] cells = {(Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex))};
 			switch (mode) {
 			case 0: {
 				for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
@@ -324,7 +313,7 @@ public class Graph extends JScrollPane {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
 		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\images\\graph_" + numberImage + ".jpg";
-		this.numberImage += 1;
+		Graph.numberImage += 1;
 		File imgFile = new File(str);
 		try {
 			ImageIO.write(image, "JPG", imgFile);

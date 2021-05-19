@@ -35,6 +35,17 @@ import javax.swing.JTextField;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Choice;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
+import javax.swing.JList;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.AbstractListModel;
+import javax.swing.JComboBox;
 
 public class GraphIllustrate extends JFrame {
 	/**
@@ -47,6 +58,8 @@ public class GraphIllustrate extends JFrame {
 	private final Dimension DEFAULT_SIZE = new Dimension(1600, 900);
 	private JTextArea txtPATHLOG;
 	private JTextField textField;
+	private Choice choice;
+	private Graph graphIllustrate;
 
 	public GraphIllustrate() {
 		setForeground(Color.LIGHT_GRAY);
@@ -56,7 +69,7 @@ public class GraphIllustrate extends JFrame {
 		setBounds(100, 100, 1500, 900);
 		setSize(DEFAULT_SIZE);
 
-		final Graph graphIllustrate = new Graph();
+		graphIllustrate = new Graph();
 		graphIllustrate.setBounds(328, 11, 1190, 750);
 		graphIllustrate.init();
 		getContentPane().setLayout(null);
@@ -148,9 +161,9 @@ public class GraphIllustrate extends JFrame {
 					RedoStack.push(PathHistory.get(currentIndex));
 					String currentNode = PathHistory.get(currentIndex);
 					PathHistory.remove(currentIndex);
-					
+
 					// Make Path string to string like "123456"
-					String strPath = PathHistory.toString().replaceAll(", |[|]", "");
+					String strPath = PathHistory.toString().replaceAll(" |[|]", "");
 
 					// Check the node is in the Path History
 					if (!(strPath.indexOf(currentNode) >= 0)) {
@@ -163,7 +176,7 @@ public class GraphIllustrate extends JFrame {
 						if (currentIndex > 0)
 							graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 					} else {
-						String strEdge = PathHistory.get(currentIndex - 1) + currentNode;
+						String strEdge = PathHistory.get(currentIndex - 1) +"," +  currentNode;
 						if (!(strPath.indexOf(strEdge) >= 0)) {
 							graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 							System.out.println(strEdge);
@@ -180,6 +193,8 @@ public class GraphIllustrate extends JFrame {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
+					
+					setChoice();
 				} else {
 					JOptionPane.showMessageDialog(btnUNDO, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
 				}
@@ -223,6 +238,7 @@ public class GraphIllustrate extends JFrame {
 				} else {
 					JOptionPane.showMessageDialog(btnREDO, "There's no redo node", "Alert", JOptionPane.ERROR_MESSAGE);
 				}
+				setChoice();
 			}
 		});
 		btnREDO.setBounds(1528, 315, 46, 46);
@@ -243,7 +259,7 @@ public class GraphIllustrate extends JFrame {
 		getContentPane().add(graphIllustrate);
 
 		JPanel panelButton = new JPanel();
-		panelButton.setBounds(328, 773, 1146, 77);
+		panelButton.setBounds(328, 773, 1246, 77);
 		getContentPane().add(panelButton);
 		panelButton.setLayout(null);
 
@@ -271,31 +287,36 @@ public class GraphIllustrate extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
-				
+
 				String nodeStart;
-//				nodeStart = graphIllustrate.cellToVertexMap.get(graphIllustrate.jgxAdapter.getSelectionCell());
-//				graphIllustrate.jgxAdapter.selectAll();
-//				System.out.print(nodeStart);
-				if (!(textField.getText().equals(""))){
+
+				if (!(textField.getText().equals(""))) {
 					nodeStart = textField.getText();
 					System.out.print(nodeStart);
 				} else {
 					nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
 							JOptionPane.QUESTION_MESSAGE);
 				}
-				
+
 				try {
-					graphIllustrate.paintNode(nodeStart, 0);
-					PathHistory.add(nodeStart);
-				} catch (WrongVertexException e1) {
-					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(btnSTART, "There's no node in this graph", "Alert",
-							JOptionPane.ERROR_MESSAGE);
-				} catch (Exception e2) {
-					// TODO: handle exception
-					
+					Integer.parseInt(nodeStart);
+					try {
+						graphIllustrate.paintNode(nodeStart, 0);
+						PathHistory.add(nodeStart);
+						setChoice();
+					} catch (WrongVertexException e1) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(btnSTART, "There's no node in this graph", "Alert",
+								JOptionPane.ERROR_MESSAGE);
+					}
 				}
+				catch (Exception e1) {
+					// TODO: handle exception
+					JOptionPane.showMessageDialog(btnSTART, "Wrong node", "Alert",
+							JOptionPane.ERROR_MESSAGE);
+				}
+				
+
 			}
 		});
 		btnSTART.setBounds(28, 20, 100, 41);
@@ -336,6 +357,7 @@ public class GraphIllustrate extends JFrame {
 						graphIllustrate.paintEdge(currentVertex, vnext, 0);
 
 					}
+					setChoice();
 				} else {
 					JOptionPane.showMessageDialog(btnNEXT, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
 				}
@@ -346,6 +368,10 @@ public class GraphIllustrate extends JFrame {
 		panelButton.add(btnNEXT);
 
 		final JButton btnLIST = new JButton("LIST NEXT");
+		btnLIST.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnLIST.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -418,17 +444,81 @@ public class GraphIllustrate extends JFrame {
 		panelButton.add(btnRESET);
 
 		textField = new JTextField();
+		textField.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(textField, "Input your start node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+			}
+		});
 		textField.setHorizontalAlignment(SwingConstants.CENTER);
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				String newnode = textField.getText();
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					// Clear all history of before graph and text Path Log
+					graphIllustrate.repaintGraph();
+					RedoStack.clear();
+					PathHistory.clear();
 
+					try {
+						txtPATHLOG.replaceRange(null, txtPATHLOG.getLineStartOffset(0),
+								txtPATHLOG.getLineEndOffset(txtPATHLOG.getLineCount() - 1));
+					} catch (BadLocationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+					String nodeStart = textField.getText();
+					try {
+						graphIllustrate.paintNode(nodeStart, 0);
+						PathHistory.add(nodeStart);
+						setChoice();
+					} catch (WrongVertexException e1) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(textField, "There's no node in this graph", "Alert",
+								JOptionPane.ERROR_MESSAGE);
+					} catch (Exception e2) {
+						// TODO: handle exception
+						JOptionPane.showMessageDialog(textField, "Wrong input", "Alert",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
 			}
 		});
 		textField.setBounds(138, 20, 91, 41);
 		panelButton.add(textField);
 		textField.setColumns(10);
+
+		choice = new Choice();
+		choice.add("<None>");
+		
+		choice.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				String nextNode = (String) e.getItem();
+				System.out.println(nextNode);
+				try {
+					graphIllustrate.paintNode(nextNode, 0);
+				} catch (WrongVertexException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				graphIllustrate.paintEdge(PathHistory.get(PathHistory.size() - 1), nextNode, 0);
+				txtPATHLOG.append(PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1)
+				+ " => " + nextNode + "\n");
+				PathHistory.add(nextNode);
+				setChoice();
+			}
+		});
+		choice.setBounds(779, 22, 148, 39);
+		panelButton.add(choice);
+		
+		String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
 
 		JPanel panelLEFT = new JPanel();
 		panelLEFT.setBounds(12, 11, 306, 839);
@@ -449,6 +539,18 @@ public class GraphIllustrate extends JFrame {
 		txtPATHLOG.setFont(new Font("Courier New", Font.PLAIN, 14));
 		txtPATHLOG.setEditable(false);
 		scrollPane.setViewportView(txtPATHLOG);
+	}
+
+	public void setChoice() {
+		choice.removeAll();
+		choice.add("<None>");
+		if (PathHistory.size() > 0) {
+			String currentVertex = PathHistory.get(PathHistory.size() - 1);
+			List<String> nextVertex = graphIllustrate.getNextVertex(currentVertex);
+			for (int i = 0; i < nextVertex.size(); i++) {
+				choice.add(nextVertex.get(i));
+			}
+		}
 	}
 
 	public static void main(String[] args) {
