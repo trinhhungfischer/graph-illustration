@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
@@ -27,9 +26,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
 
-import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxFastOrganicLayout;
-import com.mxgraph.layout.mxOrganicLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -37,11 +34,9 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxStyleUtils;
-import com.mxgraph.view.mxGraph;
 
 import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.readgraph.ReadGraph;
-import bobo4.flowgraph.utils.FindPath;
 
 public class Graph extends JScrollPane {
 	/**
@@ -76,7 +71,7 @@ public class Graph extends JScrollPane {
 			put(mxConstants.STYLE_FONTCOLOR, "FFFFFF");
 		}
 	};
-	// All attribute of the edge style you can declare in this hashmap
+	// All attribute of the edge style you can declare in this hash map
 	private Map<Object, Object> edgeDefaultStyle = new HashMap<Object, Object>() {
 		{
 			put(mxConstants.STYLE_STROKECOLOR, "000000");
@@ -91,7 +86,7 @@ public class Graph extends JScrollPane {
 			put(mxConstants.STYLE_FONTCOLOR, "FFFFFF");
 		}
 	};
-	// All attribute of the edge style you can declare in this hashmap
+	// All attribute of the edge style you can declare in this hash map
 	private Map<Object, Object> edgeAfterStyle = new HashMap<Object, Object>() {
 		{
 //			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
@@ -115,7 +110,8 @@ public class Graph extends JScrollPane {
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
 		jgxAdapter.setCellsSelectable(true);
-
+		this.init();
+		
 		add(component);
 		setViewportView(component);
 		setWheelScrollingEnabled(false);

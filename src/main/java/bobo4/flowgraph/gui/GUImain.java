@@ -104,7 +104,7 @@ public class GUImain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: add action
 				try {
-					GraphIllustrate illustration = new GraphIllustrate();
+					GUIGraphIllustration illustration = new GUIGraphIllustration();
 					illustration.setVisible(true);
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -121,4 +121,9 @@ public class GUImain extends JFrame {
 		optionPanel.add(buttonSimulationPath);
 	}
 
+	public static void main(String[] args) {
+		GUImain hung = new GUImain();
+		hung.setVisible(true);
+	}
+	
 }
