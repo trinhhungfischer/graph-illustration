@@ -23,16 +23,26 @@ import bobo4.flowgraph.utils.PrintGraph;
 import java.awt.GridLayout;
 
 public class GUImain extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel optionPanel;
 	private JPanel groupInfoPanel;
 	private JButton buttonPrintGraph;
 	private JButton buttonPrintPath;
 	private JButton buttonSimulationPath;
+	private JButton buttonReadGraph;
 
 	public GUImain() {
 		this.setSize(1024, 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationByPlatform(true);
+
+		while (FileChooser.DirectoryPath == null) {
+			new FileChooser();
+		}
+		new ReadGraph(FileChooser.DirectoryPath);
 
 		initGroupInfo();
 		initOption();
@@ -44,7 +54,6 @@ public class GUImain extends JFrame {
 
 	private void initGroupInfo() {
 		groupInfoPanel = new JPanel();
-//		groupInfoPanel.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JLabel label = new JLabel(
 				"<html><br/><br/>WELCOME TO OUR APPLICATION! <br/><br/>20170106 - Nguyen Mai Phuong <br/>20190054 - Trinh Quang Hung <br/>20194058 - Nguyen Huy Hoang <br/>20194013 - Cao Nhu Dat <br/>20193988 - Tran Tien Bang <br/>20194762 - Nguyen Trung Hieu</html>",
@@ -60,6 +69,7 @@ public class GUImain extends JFrame {
 		initButtonPrintGraph();
 		initButtonPrintPath();
 		initButtonSimulationPath();
+		initButtonReadGraph();
 	}
 
 	private void initButtonPrintGraph() {
@@ -76,7 +86,7 @@ public class GUImain extends JFrame {
 		buttonPrintGraph.setVisible(true);
 		buttonPrintGraph.setPreferredSize(new Dimension(150, 60));
 		buttonPrintGraph.addActionListener(action);
-		optionPanel.setLayout(new GridLayout(0, 3, 0, 0));
+		optionPanel.setLayout(new GridLayout(0, 4, 0, 0));
 
 		optionPanel.add(buttonPrintGraph);
 	}
@@ -85,7 +95,7 @@ public class GUImain extends JFrame {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: add action
-				FindPath path = new FindPath(new ReadGraph().getGraph());
+				FindPath path = new FindPath("1", "6");
 				path.print();
 			}
 		};
@@ -104,7 +114,7 @@ public class GUImain extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO: add action
 				try {
-					GraphIllustrate illustration = new GraphIllustrate();
+					GUIGraphIllustration illustration = new GUIGraphIllustration();
 					illustration.setVisible(true);
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -119,6 +129,31 @@ public class GUImain extends JFrame {
 		buttonSimulationPath.addActionListener(action);
 
 		optionPanel.add(buttonSimulationPath);
+	}
+
+	private void initButtonReadGraph() {
+		ActionListener action = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// TODO: add action
+				do {
+					new FileChooser();
+				} while (FileChooser.DirectoryPath == null);
+				new ReadGraph(FileChooser.DirectoryPath);
+			}
+		};
+
+		buttonReadGraph = new JButton("4. READ ANOTHER GRAPH DATA");
+		buttonReadGraph.setEnabled(true);
+		buttonReadGraph.setVisible(true);
+		buttonReadGraph.setPreferredSize(new Dimension(150, 60));
+		buttonReadGraph.addActionListener(action);
+
+		optionPanel.add(buttonReadGraph);
+	}
+
+	public static void main(String[] args) {
+		GUImain hung = new GUImain();
+		hung.setVisible(true);
 	}
 
 }

@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import org.jgrapht.ListenableGraph;
-import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultListenableGraph;
 
@@ -15,19 +16,19 @@ public class ReadGraph {
 	private static ListenableGraph<String, FlowEdge> graph = new DefaultListenableGraph<>(
 			new DefaultDirectedGraph<String, FlowEdge>(FlowEdge.class));
 
-	public ListenableGraph<String, FlowEdge> getGraph() {
+	public static ListenableGraph<String, FlowEdge> getGraph() {
 		return graph;
 	}
 
-	public void setGraph(ListenableGraph<String, FlowEdge> graph) {
-		this.graph = graph;
+	public static void setGraph(ListenableGraph<String, FlowEdge> graph) {
+		ReadGraph.graph = graph;
 	}
 
-	public ReadGraph() {
+	public ReadGraph(String DirectoryPath) {
 		try {
-			boolean[] isInGraph = new boolean[300];
+			boolean[] isInGraph = new boolean[2000];
 			// Need to improve that can get current file of App and read graph txt
-			File graphFile = new File(".\\src\\main\\java\\bobo4\\flowgraph\\asset\\graph.txt");
+			File graphFile = new File(DirectoryPath);
 			// Open file to read by scanner
 			Scanner fileReader = new Scanner(graphFile);
 
@@ -37,19 +38,21 @@ public class ReadGraph {
 
 				for (int i = 0; i < verticesList.length; i++) {
 					int c = Integer.parseInt(verticesList[i]);
-					if (isInGraph[c] == false)
-					{
-						this.graph.addVertex(verticesList[i]);
+					if (isInGraph[c] == false) {
+						ReadGraph.graph.addVertex(verticesList[i]);
 						isInGraph[c] = true;
 					}
-					if (i >= 1) this.graph.addEdge(verticesList[0], verticesList[i]);
+					if (i >= 1)
+						ReadGraph.graph.addEdge(verticesList[0], verticesList[i]);
 				}
 			}
 
 			fileReader.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "File not found or wrong file type", "Warning",
+					JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Acess denied", "Warning", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }
