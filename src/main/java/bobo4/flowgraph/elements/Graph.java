@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -39,8 +38,6 @@ import com.mxgraph.util.mxStyleUtils;
 
 import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.readgraph.ReadGraph;
-import bobo4.flowgraph.utils.GraphIllustrate;
-import bobo4.flowgraph.utils.Mutex;
 
 public class Graph extends JScrollPane implements Runnable {
 	/**
@@ -103,13 +100,14 @@ public class Graph extends JScrollPane implements Runnable {
 	public Graph() {
 		// Create a visualization using JGraph, via an adapter
 		jgxAdapter = new JGraphXAdapter<>(graph);
+		jgxAdapter.setCellsResizable(false);
+		jgxAdapter.setAutoSizeCells(true);
 
 		edgeToCellMap = jgxAdapter.getEdgeToCellMap();
 		vertexToCellMap = jgxAdapter.getVertexToCellMap();
 		cellToVertexMap = jgxAdapter.getCellToVertexMap();
 
 		setPreferredSize(DEFAULT_SIZE);
-		// TODO Auto-generated method stub
 		component = new mxGraphComponent(jgxAdapter);
 		component.setConnectable(false);
 		component.getGraph().setAllowDanglingEdges(false);
@@ -176,9 +174,7 @@ public class Graph extends JScrollPane implements Runnable {
 	}
 
 	public void paintNode(String node, int mode) throws WrongVertexException {
-		// TODO Auto-generated method stub
-
-		jgxAdapter.getModel().beginUpdate();
+			jgxAdapter.getModel().beginUpdate();
 
 		if (Integer.parseInt(node) > graph.vertexSet().size())
 			throw new WrongVertexException();
@@ -205,7 +201,6 @@ public class Graph extends JScrollPane implements Runnable {
 				}
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 			} finally {
 				jgxAdapter.clearSelection();
@@ -215,7 +210,6 @@ public class Graph extends JScrollPane implements Runnable {
 	}
 
 	public void paintEdge(String startVertex, String targetVertex, int mode) {
-		// TODO Auto-generated method stub
 
 		jgxAdapter.getModel().beginUpdate();
 		try {
@@ -318,7 +312,6 @@ public class Graph extends JScrollPane implements Runnable {
 		try {
 			ImageIO.write(image, "JPG", imgFile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (isNotify)
@@ -360,19 +353,6 @@ public class Graph extends JScrollPane implements Runnable {
 
 	public String getLastNode() {
 		return Integer.toString(graph.vertexSet().size());
-	}
-
-	public void paintPathInDelay(GraphPath<String, FlowEdge> path, int timeDelay) throws WrongVertexException, InterruptedException {
-		jgxAdapter.getModel().beginUpdate();
-		this.paintNode(path.getStartVertex(), 0);
-		for (int i = 0; i < path.getEdgeList().size(); i++) {
-			this.paintNode(path.getEdgeList().get(i).getTarget().toString(), 0);
-			this.paintEdge(path.getEdgeList().get(i).getSource().toString(),
-					path.getEdgeList().get(i).getTarget().toString(), 0);
-		}
-		Thread.sleep(timeDelay);
-		jgxAdapter.getModel().endUpdate();
-
 	}
 
 	// Inner class to solve mouse listener

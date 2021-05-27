@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.ImageObserver;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,17 +30,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
 
-import org.jgrapht.GraphPath;
-
-import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
 import bobo4.flowgraph.exception.WrongVertexException;
-import bobo4.flowgraph.utils.FindPath;
 import bobo4.flowgraph.utils.GraphIllustrate;
-import bobo4.flowgraph.utils.Mutex;
 
 public class GUIGraphIllustration extends JFrame {
 
@@ -53,12 +50,14 @@ public class GUIGraphIllustration extends JFrame {
 	private JTextField textFieldStart;
 
 	private Choice choice;
-
 	private JTextArea txtPATHLOG;
 	private JButton btnQUESTION;
 	private Graph graphScrollPanel = new Graph();
 	private JLabel lblNewLabel;
 	private JTextField textFieldEnd;
+	private JPanel panelGRAPH;
+
+	public static boolean hasTimerTask = false;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -125,7 +124,12 @@ public class GUIGraphIllustration extends JFrame {
 		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/pause.png")).getImage();
 		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
-		ImageIcon PauseImage = new ImageIcon(newImg);
+		final ImageIcon PauseImage = new ImageIcon(newImg);
+
+		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/play.png")).getImage();
+		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
+				java.awt.Image.SCALE_SMOOTH);
+		final ImageIcon PlayImage = new ImageIcon(newImg);
 
 		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/speed-up.png")).getImage();
 		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
@@ -136,6 +140,7 @@ public class GUIGraphIllustration extends JFrame {
 		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
 		ImageIcon SpeedDownImage = new ImageIcon(newImg);
+
 		getContentPane().setLayout(new BorderLayout(10, 10));
 
 		JPanel panelHEAD = new JPanel();
@@ -264,13 +269,13 @@ public class GUIGraphIllustration extends JFrame {
 					isQuestion[0] = 0;
 				}
 
-				GraphManager.Reset();
+				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG);
 			}
 		});
 		btnRESET.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnRESET);
 
-		lblNewLabel = new JLabel("Current node is: ");
+		lblNewLabel = new JLabel("Current node is: None");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(lblNewLabel);
 
@@ -319,19 +324,15 @@ public class GUIGraphIllustration extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnAUTO, "Auto walk to end node, if end node is null \n max vertex is default.", "Instruction",
+					JOptionPane.showMessageDialog(btnAUTO,
+							"Auto walk to end node, if end node is null \n max vertex is default.", "Instruction",
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				new FindPath(textFieldStart.getText(), textFieldEnd.getText());
-				try {
-					GraphManager.Auto(textFieldStart.getText(), textFieldEnd.getText());
-				} catch (WrongVertexException | InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 
-		
+				GUIGraphIllustration.hasTimerTask = true;
+				GraphManager.Auto(textFieldStart.getText(), textFieldEnd.getText(), choice, lblNewLabel, txtPATHLOG);
+
 			}
 		});
 		btnAUTO.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -346,7 +347,8 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				GraphManager.ListNextNode(txtPATHLOG);
+				GraphManager.ListPath(textFieldStart.getText(), textFieldEnd.getText(), txtPATHLOG, choice,
+						lblNewLabel);
 			}
 		});
 		btnLISTPATH.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -485,6 +487,7 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
+				GraphManager.SpeedUp();
 			}
 		});
 		panelLEFTBUTTON.add(btnSPEEDUP);
@@ -500,11 +503,14 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
+				GraphManager.SpeedDown();
+
 			}
 		});
 		panelLEFTBUTTON.add(btnSPEEDDOWN);
 		btnSPEEDDOWN.setIcon(SpeedDownImage);
 
+		final boolean[] isStop = { false };
 		final JButton btnPAUSE = new JButton();
 		btnPAUSE.setBackground(Color.LIGHT_GRAY);
 		btnPAUSE.addActionListener(new ActionListener() {
@@ -515,12 +521,23 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
+				if (hasTimerTask)
+					if (isStop[0] == false) {
+						GraphManager.Stop();
+						isStop[0] = true;
+						btnPAUSE.setIcon(PlayImage);
+					} else {
+						GraphManager.Continue();
+						isStop[0] = false;
+						btnPAUSE.setIcon(PauseImage);
+					}
 			}
+
 		});
 		panelLEFTBUTTON.add(btnPAUSE);
 		btnPAUSE.setIcon(PauseImage);
 
-		JPanel panelGRAPH = new JPanel();
+		panelGRAPH = new JPanel();
 		panelGRAPH.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panelGRAPH, BorderLayout.CENTER);
 		panelGRAPH.setLayout(new BorderLayout(0, 0));
