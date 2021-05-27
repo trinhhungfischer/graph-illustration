@@ -11,6 +11,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
+import org.jgrapht.GraphPath;
+
+import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
 import bobo4.flowgraph.exception.WrongVertexException;
 
@@ -19,7 +22,10 @@ public class GraphIllustrate {
 	private Graph graphIllustrate;
 	private List<String> PathHistory = new ArrayList<>();
 	private Stack<String> RedoStack = new Stack<>();
-
+	private int delayTime = 2000;
+	public static boolean unlock = true;
+	
+	
 	public GraphIllustrate(Graph graphIllustrate) {
 		// TODO Auto-generated constructor stub
 		this.graphIllustrate = graphIllustrate;
@@ -51,7 +57,7 @@ public class GraphIllustrate {
 	}
 
 	public void Save() {
-		graphIllustrate.saveImage();
+		graphIllustrate.saveImage(true);
 	}
 
 	public void Next(Choice choice, JLabel myLabel, JTextArea txtPATHLOG) {
@@ -152,9 +158,8 @@ public class GraphIllustrate {
 	public void ZoomOut() {
 		graphIllustrate.zoomOut(graphIllustrate.getBounds().x / 2, graphIllustrate.getBounds().y / 2);
 	}
-	
-	public void Undo(Choice choice, JLabel myLabel, JTextArea txtPATHLOG)
-	{
+
+	public void Undo(Choice choice, JLabel myLabel, JTextArea txtPATHLOG) {
 		if (PathHistory.size() > 0) {
 			int currentIndex = PathHistory.size() - 1; // currentIndex = n - 1;
 			RedoStack.push(PathHistory.get(currentIndex));
@@ -163,10 +168,8 @@ public class GraphIllustrate {
 
 			// Make Path string to string like "123456"
 
-			
 			String strPath = PathHistory.toString().replaceAll(", ", " ,+").replace("[", "+").replace("]", " ");
-			
-			
+
 			// Check the node is in the Path History
 			if (!(PathHistory.contains(currentNode))) {
 				try {
@@ -178,7 +181,7 @@ public class GraphIllustrate {
 				if (currentIndex > 0)
 					graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 			} else {
-				String strEdge ="+" + PathHistory.get(currentIndex - 1) +" ,+" +  currentNode;
+				String strEdge = "+" + PathHistory.get(currentIndex - 1) + " ,+" + currentNode;
 				if (!(strPath.indexOf(strEdge) >= 0)) {
 					graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 				}
@@ -193,18 +196,18 @@ public class GraphIllustrate {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			
+
 			SetChoiceAndUpdate(choice, myLabel);
 		} else {
 			JOptionPane.showMessageDialog(null, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	public void Redo(Choice choice, JLabel myLabel, JTextArea txtPATHLOG)
-	{
+	public void Redo(Choice choice, JLabel myLabel, JTextArea txtPATHLOG) {
 		if (RedoStack.size() > 0) {
 			int currentIndex = PathHistory.size() - 1;
 			String newNode = RedoStack.pop();
+			
 			try {
 				graphIllustrate.paintNode(newNode, 0);
 			} catch (WrongVertexException e1) {
@@ -213,8 +216,7 @@ public class GraphIllustrate {
 			}
 			if (currentIndex >= 0) {
 				graphIllustrate.paintEdge(PathHistory.get(currentIndex), newNode, 1);
-				txtPATHLOG.append(
-						(currentIndex + 1) + ")  " + PathHistory.get(currentIndex) + " => " + newNode + "\n");
+				txtPATHLOG.append((currentIndex + 1) + ")  " + PathHistory.get(currentIndex) + " => " + newNode + "\n");
 				graphIllustrate.paintEdge(PathHistory.get(currentIndex), newNode, 0);
 			}
 			PathHistory.add(newNode);
@@ -223,9 +225,13 @@ public class GraphIllustrate {
 		}
 		SetChoiceAndUpdate(choice, myLabel);
 	}
-	
-	public void Auto()
-	{
-		
+
+	public void Auto(String nodeStart, String nodeEnd) throws WrongVertexException, InterruptedException {
+		new FindPath(nodeStart, nodeEnd);
+		if (FindPath.getListPath().size() == 0) {
+			JOptionPane.showMessageDialog(null, "There's no path to go last node", "Alert", JOptionPane.ERROR_MESSAGE);
+		} else {
+			graphIllustrate.paintPathInDelay(FindPath.getRandomPath(), 10000);
+		}
 	}
 }

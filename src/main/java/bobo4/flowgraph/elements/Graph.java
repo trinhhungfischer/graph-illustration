@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
@@ -37,8 +39,10 @@ import com.mxgraph.util.mxStyleUtils;
 
 import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.readgraph.ReadGraph;
+import bobo4.flowgraph.utils.GraphIllustrate;
+import bobo4.flowgraph.utils.Mutex;
 
-public class Graph extends JScrollPane {
+public class Graph extends JScrollPane implements Runnable {
 	/**
 	 * 
 	 */
@@ -53,7 +57,7 @@ public class Graph extends JScrollPane {
 	// graph
 	public JGraphXAdapter<String, FlowEdge> jgxAdapter;
 
-	private ListenableGraph<String, FlowEdge> graph = new ReadGraph().getGraph();
+	private ListenableGraph<String, FlowEdge> graph = ReadGraph.getGraph();
 
 	private mxGraphComponent component;
 
@@ -111,7 +115,7 @@ public class Graph extends JScrollPane {
 		component.getGraph().setAllowDanglingEdges(false);
 		jgxAdapter.setCellsSelectable(true);
 		this.init();
-		
+
 		add(component);
 		setViewportView(component);
 		setWheelScrollingEnabled(false);
@@ -165,7 +169,7 @@ public class Graph extends JScrollPane {
 
 		mxFastOrganicLayout layout = new mxFastOrganicLayout(jgxAdapter);
 		layout.setMaxDistanceLimit(200.0f);
-		layout.setMinDistanceLimit(2f);
+		layout.setMinDistanceLimit(0.5f);
 		layout.setInitialTemp(200f);
 		layout.setMaxIterations(2000);
 		layout.execute(jgxAdapter.getDefaultParent());
@@ -180,8 +184,8 @@ public class Graph extends JScrollPane {
 			throw new WrongVertexException();
 		else
 			try {
-				
-				Object[] cells = {(Object) vertexToCellMap.get(node)};
+
+				Object[] cells = { (Object) vertexToCellMap.get(node) };
 
 				switch (mode) {
 				case 0: {
@@ -200,7 +204,6 @@ public class Graph extends JScrollPane {
 					}
 				}
 				}
-
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();
@@ -208,6 +211,7 @@ public class Graph extends JScrollPane {
 				jgxAdapter.clearSelection();
 				jgxAdapter.getModel().endUpdate();
 			}
+
 	}
 
 	public void paintEdge(String startVertex, String targetVertex, int mode) {
@@ -215,7 +219,7 @@ public class Graph extends JScrollPane {
 
 		jgxAdapter.getModel().beginUpdate();
 		try {
-			Object[] cells = {(Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex))};
+			Object[] cells = { (Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex)) };
 			switch (mode) {
 			case 0: {
 				for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
@@ -282,8 +286,8 @@ public class Graph extends JScrollPane {
 
 	public void zoomIn(int x, int y) {
 		component.setCenterZoom(component.isCenterPage());
-		double newX = x - component.getViewport().getSize().getWidth() / 2;
-		double newY = y - component.getViewport().getSize().getHeight() / 2;
+//		double newX = x - component.getViewport().getSize().getWidth() / 2;
+//		double newY = y - component.getViewport().getSize().getHeight() / 2;
 
 		Point leftPoint = new Point();
 		leftPoint.setLocation(x, y);
@@ -295,8 +299,8 @@ public class Graph extends JScrollPane {
 	public void zoomOut(int x, int y) {
 		component.setCenterZoom(component.isCenterPage());
 
-		double newX = x - component.getViewport().getSize().getWidth() / 2;
-		double newY = y - component.getViewport().getSize().getHeight() / 2;
+//		double newX = x - component.getViewport().getSize().getWidth() / 2;
+//		double newY = y - component.getViewport().getSize().getHeight() / 2;
 
 		Point leftPoint = new Point();
 		leftPoint.setLocation(x, y);
@@ -305,7 +309,7 @@ public class Graph extends JScrollPane {
 		component.scrollRectToVisible(new Rectangle(leftPoint, component.getViewport().getSize()));
 	}
 
-	public void saveImage() {
+	public void saveImage(boolean isNotify) {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
 		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\images\\graph_" + numberImage + ".jpg";
@@ -317,6 +321,11 @@ public class Graph extends JScrollPane {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if (isNotify)
+			JOptionPane.showMessageDialog(null,
+					"Save graph as image graph_" + numberImage + ".jpg in asset/images folder", "Notice",
+					JOptionPane.INFORMATION_MESSAGE);
+
 	}
 
 	public void paintPath(GraphPath<String, FlowEdge> path) {
@@ -349,11 +358,27 @@ public class Graph extends JScrollPane {
 
 	}
 
+	public String getLastNode() {
+		return Integer.toString(graph.vertexSet().size());
+	}
+
+	public void paintPathInDelay(GraphPath<String, FlowEdge> path, int timeDelay) throws WrongVertexException, InterruptedException {
+		jgxAdapter.getModel().beginUpdate();
+		this.paintNode(path.getStartVertex(), 0);
+		for (int i = 0; i < path.getEdgeList().size(); i++) {
+			this.paintNode(path.getEdgeList().get(i).getTarget().toString(), 0);
+			this.paintEdge(path.getEdgeList().get(i).getSource().toString(),
+					path.getEdgeList().get(i).getTarget().toString(), 0);
+		}
+		Thread.sleep(timeDelay);
+		jgxAdapter.getModel().endUpdate();
+
+	}
+
+	// Inner class to solve mouse listener
 	private class MyMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 		Point startPoint = new Point();
-
-		private float MOVE_SPEED = 1.5f;
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
@@ -413,5 +438,11 @@ public class Graph extends JScrollPane {
 
 		}
 
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		this.init();
 	}
 }

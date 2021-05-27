@@ -31,7 +31,7 @@ public class PrintGraph extends JFrame {
 		final Graph graphIllustrate = new Graph();
 		graphIllustrate.setBounds(10, 11, 1884, 1019);
 		graphIllustrate.init();
-		graphIllustrate.saveImage();
+		graphIllustrate.saveImage(false);
 		getContentPane().setLayout(null);
 		
 		JButton btnRETURN = new JButton("RETURN");
