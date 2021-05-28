@@ -10,7 +10,6 @@ public class FileChooser {
 	public static String DirectoryPath;
 	
 	public FileChooser() {
-		// TODO Auto-generated constructor stub
 		JFileChooser file = new JFileChooser();
 		String str = null;
 		file.setMultiSelectionEnabled(true);

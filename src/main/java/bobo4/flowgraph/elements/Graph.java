@@ -62,8 +62,13 @@ public class Graph extends JScrollPane implements Runnable {
 	private HashMap<String, mxICell> vertexToCellMap;
 	public HashMap<mxICell, String> cellToVertexMap;
 
-	// All attribute of the vertex style you can declare in this hashmap
+	// All attribute of the vertex style you can declare in this hash map
 	private Map<Object, Object> vertexDefaultStyle = new HashMap<Object, Object>() {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		{
 			put(mxConstants.STYLE_FONTSIZE, 20);
 			put(mxConstants.STYLE_FILLCOLOR, "D98282");
@@ -74,12 +79,22 @@ public class Graph extends JScrollPane implements Runnable {
 	};
 	// All attribute of the edge style you can declare in this hash map
 	private Map<Object, Object> edgeDefaultStyle = new HashMap<Object, Object>() {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		{
 			put(mxConstants.STYLE_STROKECOLOR, "000000");
 		}
 	};
 
 	private Map<Object, Object> vertexAfterStyle = new HashMap<Object, Object>() {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		{
 			put(mxConstants.STYLE_FONTSIZE, 20);
 			put(mxConstants.STYLE_FILLCOLOR, "BD2BE8");
@@ -89,6 +104,11 @@ public class Graph extends JScrollPane implements Runnable {
 	};
 	// All attribute of the edge style you can declare in this hash map
 	private Map<Object, Object> edgeAfterStyle = new HashMap<Object, Object>() {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		{
 //			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
 			put(mxConstants.STYLE_FILLCOLOR, "F9F900");
@@ -362,7 +382,6 @@ public class Graph extends JScrollPane implements Runnable {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			// TODO Auto-generated method stub
 			if (e.getWheelRotation() > 0)
 				zoomOut(e.getX(), e.getY());
 			else
@@ -371,7 +390,6 @@ public class Graph extends JScrollPane implements Runnable {
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			// TODO Auto-generated method stub
 			JViewport vport = (JViewport) e.getSource();
 			Point pt = e.getPoint();
 			int dx = startPoint.x - pt.x;
@@ -384,37 +402,31 @@ public class Graph extends JScrollPane implements Runnable {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			// TODO Auto-generated method stub
 			startPoint = e.getPoint();
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 

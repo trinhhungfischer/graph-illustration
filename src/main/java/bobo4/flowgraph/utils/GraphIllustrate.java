@@ -27,8 +27,12 @@ public class GraphIllustrate {
 	private List<String> PathHistory = new ArrayList<>();
 	private Stack<String> RedoStack = new Stack<>();
 	private int delayTime = 5000;
-	public static boolean unlock = true;
-	private boolean isRunAuto = false;
+	private static boolean isRunAuto = false;
+	
+
+	public static boolean isRunAuto() {
+		return isRunAuto;
+	}
 	private boolean isStopRunAuto = false;
 	private Timer timer;
 
@@ -59,6 +63,9 @@ public class GraphIllustrate {
 	}
 
 	public void Reset(Choice choice, JLabel myLabel, JTextArea txtPATHLOG) {
+		isRunAuto = false;
+		isStopRunAuto = false;
+		GUIGraphIllustration.hasTimerTask = false;
 		graphIllustrate.init();
 		PathHistory.clear();
 		txtPATHLOG.setText(null);

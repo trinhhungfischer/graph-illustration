@@ -31,15 +31,11 @@ public class FindPath {
 		this.graph = ReadGraph.getGraph();
 		listPath.clear();
 		YenKShortestPath<String, FlowEdge> somePath = new YenKShortestPath<>(this.graph);
-		List<GraphPath<String, FlowEdge>> list;
 		if (endNode.equals("")) {
 			String lastNode = Integer.toString(graph.vertexSet().size());
-			list = somePath.getPaths(startNode, lastNode, 10);
+			FindPath.listPath = somePath.getPaths(startNode, lastNode, 10);
 		} else {
-			list = somePath.getPaths(startNode, endNode, 10);
-		}
-		for (int i = 0; i < list.size(); i++) {
-			listPath.add(list.get(i));
+			FindPath.listPath = somePath.getPaths(startNode, endNode, 10);
 		}
 	}
 
@@ -66,8 +62,7 @@ public class FindPath {
 				try {
 					myGraph.paintNode("1", 0);
 				} catch (WrongVertexException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+						e.printStackTrace();
 				}
 				for (FlowEdge edge : listPath.get(i).getEdgeList()) {
 					strPath[i] += " => " + edge.getTarget();
@@ -81,9 +76,8 @@ public class FindPath {
 
 		}
 	}
-	
-	public static GraphPath<String, FlowEdge> getRandomPath()
-	{
+
+	public static GraphPath<String, FlowEdge> getRandomPath() {
 		int indexPath = new Random().nextInt(listPath.size());
 		return listPath.get(indexPath);
 	}

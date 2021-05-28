@@ -58,6 +58,7 @@ public class GUIGraphIllustration extends JFrame {
 	private JPanel panelGRAPH;
 
 	public static boolean hasTimerTask = false;
+	private JButton btnPAUSE;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -268,7 +269,8 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-
+				btnPAUSE.setIcon(PauseImage);
+				hasTimerTask = false;
 				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG);
 			}
 		});
@@ -510,8 +512,7 @@ public class GUIGraphIllustration extends JFrame {
 		panelLEFTBUTTON.add(btnSPEEDDOWN);
 		btnSPEEDDOWN.setIcon(SpeedDownImage);
 
-		final boolean[] isStop = { false };
-		final JButton btnPAUSE = new JButton();
+		btnPAUSE = new JButton();
 		btnPAUSE.setBackground(Color.LIGHT_GRAY);
 		btnPAUSE.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -522,13 +523,11 @@ public class GUIGraphIllustration extends JFrame {
 					isQuestion[0] = 0;
 				}
 				if (hasTimerTask)
-					if (isStop[0] == false) {
+					if (GraphIllustrate.isRunAuto()) {
 						GraphManager.Stop();
-						isStop[0] = true;
 						btnPAUSE.setIcon(PlayImage);
 					} else {
 						GraphManager.Continue();
-						isStop[0] = false;
 						btnPAUSE.setIcon(PauseImage);
 					}
 			}
