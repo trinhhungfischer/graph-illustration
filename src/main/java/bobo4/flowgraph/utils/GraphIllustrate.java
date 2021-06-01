@@ -14,8 +14,6 @@ import javax.swing.JTextArea;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 
-import org.jgrapht.GraphPath;
-
 import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
 import bobo4.flowgraph.exception.WrongVertexException;
@@ -26,18 +24,17 @@ public class GraphIllustrate {
 	private Graph graphIllustrate;
 	private List<String> PathHistory = new ArrayList<>();
 	private Stack<String> RedoStack = new Stack<>();
-	private int delayTime = 5000;
+	private int delayTime = 4096;
 	private static boolean isRunAuto = false;
-	
+	private Timer timer;
 
 	public static boolean isRunAuto() {
 		return isRunAuto;
 	}
+
 	private boolean isStopRunAuto = false;
-	private Timer timer;
 
 	public GraphIllustrate(Graph graphIllustrate) {
-		// TODO Auto-generated constructor stub
 		this.graphIllustrate = graphIllustrate;
 	}
 
@@ -53,12 +50,11 @@ public class GraphIllustrate {
 				graphIllustrate.paintNode(nodeStart, 0);
 				PathHistory.add(nodeStart);
 				this.SetChoiceAndUpdate(choice, currentNodeLabel);
+				PaintCurrentNode(true);
 			} catch (WrongVertexException e1) {
-				// TODO Auto-generated catch block
 				throw e1;
 			}
 		} catch (Exception e1) {
-			// TODO: handle exception
 		}
 	}
 
@@ -92,9 +88,8 @@ public class GraphIllustrate {
 						PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => " + vnext + "\n");
 				PathHistory.add(vnext);
 				try {
-					graphIllustrate.paintNode(vnext, 0);
+					PaintCurrentNode(true);
 				} catch (WrongVertexException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				graphIllustrate.paintEdge(currentVertex, vnext, 0);
@@ -106,7 +101,7 @@ public class GraphIllustrate {
 		}
 	}
 
-	public void ListNextNode(JTextArea txtPATHLOG) {
+	public void ListNextNode(JTextArea txtPATHLOG, Choice choice, JLabel myLabel) {
 		if (PathHistory.size() > 0) {
 			String currentVertex = PathHistory.get(PathHistory.size() - 1);
 			List<String> vtarget = graphIllustrate.getNextVertex(currentVertex);
@@ -125,12 +120,12 @@ public class GraphIllustrate {
 							+ vnext + "\n");
 					PathHistory.add(vnext);
 					try {
-						graphIllustrate.paintNode(vnext, 0);
+						PaintCurrentNode(true);
 					} catch (WrongVertexException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					graphIllustrate.paintEdge(currentVertex, vnext, 0);
+					SetChoiceAndUpdate(choice, myLabel);
 				}
 			}
 		} else
@@ -141,30 +136,18 @@ public class GraphIllustrate {
 		try {
 			graphIllustrate.paintNode(nextNode, 0);
 		} catch (WrongVertexException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		graphIllustrate.paintEdge(PathHistory.get(PathHistory.size() - 1), nextNode, 0);
 		txtPATHLOG.append(
 				PathHistory.size() + ")  " + PathHistory.get(PathHistory.size() - 1) + " => " + nextNode + "\n");
 		PathHistory.add(nextNode);
-		SetChoiceAndUpdate(choice, myLabel);
-	}
-
-	public void SetChoiceAndUpdate(Choice choice, JLabel myLabel) {
-		choice.removeAll();
-		choice.add("<None>");
-		if (PathHistory.size() > 0) {
-			String currentVertex = PathHistory.get(PathHistory.size() - 1);
-			List<String> nextVertex = graphIllustrate.getNextVertex(currentVertex);
-			for (int i = 0; i < nextVertex.size(); i++) {
-				choice.add(nextVertex.get(i));
-			}
+		try {
+			PaintCurrentNode(true);
+		} catch (WrongVertexException e) {
+			e.printStackTrace();
 		}
-		if (PathHistory.size() > 0) {
-			myLabel.setText("Current node is: " + PathHistory.get(PathHistory.size() - 1));
-		} else
-			myLabel.setText("Current node is: None");
+		SetChoiceAndUpdate(choice, myLabel);
 	}
 
 	public void ZoomIn() {
@@ -181,8 +164,7 @@ public class GraphIllustrate {
 			RedoStack.push(PathHistory.get(currentIndex));
 			String currentNode = PathHistory.get(currentIndex);
 			PathHistory.remove(currentIndex);
-
-			// Make Path string to string like "123456"
+			// Make Path string to string like "+1 ,+2 ,+3 ,+5 ,+6"
 
 			String strPath = PathHistory.toString().replaceAll(", ", " ,+").replace("[", "+").replace("]", " ");
 
@@ -191,16 +173,26 @@ public class GraphIllustrate {
 				try {
 					graphIllustrate.paintNode(currentNode, 1);
 				} catch (WrongVertexException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				if (currentIndex > 0)
 					graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 			} else {
+				try {
+					graphIllustrate.paintNode(currentNode, 0);
+				} catch (WrongVertexException e1) {
+					e1.printStackTrace();
+				}
 				String strEdge = "+" + PathHistory.get(currentIndex - 1) + " ,+" + currentNode;
 				if (!(strPath.indexOf(strEdge) >= 0)) {
 					graphIllustrate.paintEdge(PathHistory.get(currentIndex - 1), currentNode, 1);
 				}
+			}
+
+			try {
+				PaintCurrentNode(true);
+			} catch (WrongVertexException e) {
+				e.printStackTrace();
 			}
 
 			int line = PathHistory.size() - 1;
@@ -209,7 +201,6 @@ public class GraphIllustrate {
 					txtPATHLOG.replaceRange(null, txtPATHLOG.getLineStartOffset(line),
 							txtPATHLOG.getLineEndOffset(line));
 				} catch (BadLocationException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -227,7 +218,6 @@ public class GraphIllustrate {
 			try {
 				graphIllustrate.paintNode(newNode, 0);
 			} catch (WrongVertexException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			if (currentIndex >= 0) {
@@ -236,16 +226,19 @@ public class GraphIllustrate {
 				graphIllustrate.paintEdge(PathHistory.get(currentIndex), newNode, 0);
 			}
 			PathHistory.add(newNode);
+			try {
+				PaintCurrentNode(true);
+			} catch (WrongVertexException e) {
+				e.printStackTrace();
+			}
 		} else {
 			JOptionPane.showMessageDialog(null, "There's no redo node", "Alert", JOptionPane.ERROR_MESSAGE);
 		}
 		SetChoiceAndUpdate(choice, myLabel);
 	}
 
-
 	final int[] i = { 0 };
 	private List<String> vertexList;
-	
 
 	public void Auto(String nodeStart, String nodeEnd, final Choice choice, final JLabel myLabel,
 			final JTextArea txtPATHLOG) {
@@ -255,12 +248,11 @@ public class GraphIllustrate {
 		choice.add("<None>");
 		PathHistory.clear();
 		RedoStack.clear();
-		
+
 		timer = new Timer(delayTime, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 
 				try {
 					graphIllustrate.paintNode(vertexList.get(i[0]), 0);
@@ -270,6 +262,7 @@ public class GraphIllustrate {
 								(i[0]) + ")  " + vertexList.get(i[0] - 1) + " => " + vertexList.get(i[0]) + "\n");
 					}
 					PathHistory.add(vertexList.get(i[0]));
+					PaintCurrentNode(true);
 					SetChoiceAndUpdate(choice, myLabel);
 					i[0]++;
 					if (i[0] >= vertexList.size()) {
@@ -278,7 +271,6 @@ public class GraphIllustrate {
 						GUIGraphIllustration.hasTimerTask = false;
 					}
 				} catch (WrongVertexException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -327,6 +319,11 @@ public class GraphIllustrate {
 				strUpdate += (i + 1) + ")  " + currentEdge.getSource() + " => " + currentEdge.getTarget() + "\n";
 			}
 			PathHistory.add(FindPath.getListPath().get(index).getEndVertex());
+			try {
+				PaintCurrentNode(true);
+			} catch (WrongVertexException e) {
+				e.printStackTrace();
+			}
 			txtPATHLOG.setText(strUpdate);
 			SetChoiceAndUpdate(choice, myLabel);
 
@@ -335,43 +332,108 @@ public class GraphIllustrate {
 					"Alert", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
-	
-	public void Stop()
-	{
-		if (isRunAuto == true)
-		{
+
+	public void AutoNextNode(final Choice choice, final JLabel myLabel, final JTextArea txtPATHLOG) {
+		timer = new Timer(delayTime, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int currentIndex = PathHistory.size() - 1;
+				if (currentIndex < 0) {
+					JOptionPane.showMessageDialog(null, "There is no start node", "Alert",
+							JOptionPane.INFORMATION_MESSAGE);
+					timer.stop();
+					isRunAuto = false;
+				}
+
+				List<String> sideVertex = graphIllustrate.getNextVertex(PathHistory.get(currentIndex));
+				if (sideVertex.size() > 0) {
+					int i = new Random().nextInt(sideVertex.size());
+					PathHistory.add(sideVertex.get(i));
+					txtPATHLOG.append((PathHistory.size() - 1) + ")  " + PathHistory.get(currentIndex) + " => "
+							+ sideVertex.get(i) + "\n");
+					SetChoiceAndUpdate(choice, myLabel);
+					try {
+						graphIllustrate.paintEdge(PathHistory.get(currentIndex), sideVertex.get(i), 0);
+						PaintCurrentNode(true);
+					} catch (WrongVertexException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"There is no next node from " + PathHistory.get(currentIndex) + " to node ", "Alert",
+							JOptionPane.INFORMATION_MESSAGE);
+					timer.stop();
+					isRunAuto = false;
+				}
+			}
+		});
+		int currentIndex = PathHistory.size() - 1;
+		if (currentIndex < 0) {
+			JOptionPane.showMessageDialog(null, "There is no start node", "Alert", JOptionPane.INFORMATION_MESSAGE);
+		} else if (isRunAuto == false) {
+			isRunAuto = true;
+			timer.start();
+		} else {
 			isRunAuto = false;
-			isStopRunAuto = true;
-			timer.stop();			
+			timer.stop();
 		}
 	}
-	
-	public void Continue()
-	{
-		if (isStopRunAuto == true)
-		{
+
+	public void Stop() {
+		if (isRunAuto == true) {
+			isRunAuto = false;
+			isStopRunAuto = true;
+			timer.stop();
+		}
+	}
+
+	public void Continue() {
+		if (isStopRunAuto == true) {
 			isRunAuto = true;
 			timer.start();
 		}
 	}
-	
-	public void SpeedUp()
-	{
-		if (timer != null)
-		{
+
+	public void SpeedUp() {
+		if (timer != null) {
 			this.delayTime /= 2;
 			timer.setDelay(this.delayTime);
-			System.out.println(this.delayTime);			
+			System.out.println(this.delayTime);
 		}
 	}
-	
-	public void SpeedDown()
-	{
-		if (timer != null)
-		{
+
+	public void SpeedDown() {
+		if (timer != null) {
 			this.delayTime *= 2;
 			timer.setDelay(this.delayTime);
 			System.out.println(this.delayTime);
 		}
+	}
+
+	private void SetChoiceAndUpdate(Choice choice, JLabel myLabel) {
+		choice.removeAll();
+		choice.add("<None>");
+		if (PathHistory.size() > 0) {
+			String currentVertex = PathHistory.get(PathHistory.size() - 1);
+			List<String> nextVertex = graphIllustrate.getNextVertex(currentVertex);
+			for (int i = 0; i < nextVertex.size(); i++) {
+				choice.add(nextVertex.get(i));
+			}
+		}
+		if (PathHistory.size() > 0) {
+			myLabel.setText("Current node is: " + PathHistory.get(PathHistory.size() - 1));
+		} else
+			myLabel.setText("Current node is: None");
+	}
+
+	private void PaintCurrentNode(boolean isForWard) throws WrongVertexException {
+		int i = PathHistory.size();
+		if (i > 0) {
+			graphIllustrate.paintNode(PathHistory.get(i - 1), 2);
+			if (PathHistory.size() > 1 && isForWard)
+				graphIllustrate.paintNode(PathHistory.get(i - 2), 0);
+		}
+
 	}
 }

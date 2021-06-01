@@ -33,16 +33,13 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxCellRenderer;
-import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxStyleUtils;
 
 import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.readgraph.ReadGraph;
 
-public class Graph extends JScrollPane implements Runnable {
-	/**
-	 * 
-	 */
+public class Graph extends JScrollPane {
+
 	private static final long serialVersionUID = 1L;
 
 	private static int numberImage = 1;
@@ -63,59 +60,6 @@ public class Graph extends JScrollPane implements Runnable {
 	public HashMap<mxICell, String> cellToVertexMap;
 
 	// All attribute of the vertex style you can declare in this hash map
-	private Map<Object, Object> vertexDefaultStyle = new HashMap<Object, Object>() {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-			put(mxConstants.STYLE_FONTSIZE, 20);
-			put(mxConstants.STYLE_FILLCOLOR, "D98282");
-			put(mxConstants.STYLE_FONTSTYLE, mxConstants.FONT_BOLD);
-			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
-			put(mxConstants.STYLE_FONTCOLOR, "FFFFFF");
-		}
-	};
-	// All attribute of the edge style you can declare in this hash map
-	private Map<Object, Object> edgeDefaultStyle = new HashMap<Object, Object>() {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-			put(mxConstants.STYLE_STROKECOLOR, "000000");
-		}
-	};
-
-	private Map<Object, Object> vertexAfterStyle = new HashMap<Object, Object>() {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-			put(mxConstants.STYLE_FONTSIZE, 20);
-			put(mxConstants.STYLE_FILLCOLOR, "BD2BE8");
-//			put(mxConstants.STYLE_FONTSTYLE, mxConstants.FONT_BOLD);
-			put(mxConstants.STYLE_FONTCOLOR, "FFFFFF");
-		}
-	};
-	// All attribute of the edge style you can declare in this hash map
-	private Map<Object, Object> edgeAfterStyle = new HashMap<Object, Object>() {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-//			put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ARROW);
-			put(mxConstants.STYLE_FILLCOLOR, "F9F900");
-			put(mxConstants.STYLE_STROKECOLOR, "FD0000");
-
-		}
-	};
 
 	public Graph() {
 		// Create a visualization using JGraph, via an adapter
@@ -138,7 +82,6 @@ public class Graph extends JScrollPane implements Runnable {
 		setViewportView(component);
 		setWheelScrollingEnabled(false);
 		component.setWheelScrollingEnabled(false);
-
 		component.addMouseWheelListener(new MyMouseListener());
 	}
 
@@ -162,7 +105,7 @@ public class Graph extends JScrollPane implements Runnable {
 					geometry.setHeight(40); // This is size of other radius Circle
 				}
 			}
-			for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
+			for (Map.Entry<Object, Object> e : CellStyle.vertexDefaultStyle.entrySet()) {
 				new mxStyleUtils();
 				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
 						e.getValue().toString());
@@ -174,7 +117,7 @@ public class Graph extends JScrollPane implements Runnable {
 			jgxAdapter.selectEdges();
 			cells = jgxAdapter.getSelectionCells();
 
-			for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
+			for (Map.Entry<Object, Object> e : CellStyle.edgeDefaultStyle.entrySet()) {
 				new mxStyleUtils();
 				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
 						e.getValue().toString());
@@ -194,31 +137,34 @@ public class Graph extends JScrollPane implements Runnable {
 	}
 
 	public void paintNode(String node, int mode) throws WrongVertexException {
-			jgxAdapter.getModel().beginUpdate();
+		jgxAdapter.getModel().beginUpdate();
 
 		if (Integer.parseInt(node) > graph.vertexSet().size())
 			throw new WrongVertexException();
 		else
 			try {
-
-				Object[] cells = { (Object) vertexToCellMap.get(node) };
-
+				Map<Object, Object> vertexStyle = null;
 				switch (mode) {
 				case 0: {
-					for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
-						new mxStyleUtils();
-						mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-								e.getValue().toString());
-					}
+					vertexStyle = CellStyle.vertexAfterStyle;
 					break;
 				}
 				case 1: {
-					for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
-						new mxStyleUtils();
-						mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-								e.getValue().toString());
-					}
+					vertexStyle = CellStyle.vertexDefaultStyle;
+					break;
 				}
+				case 2: {
+					vertexStyle = CellStyle.vertexCurrentStyle;
+					break;
+				}
+				}
+
+				Object[] cells = { (Object) vertexToCellMap.get(node) };
+
+				for (Map.Entry<Object, Object> e : vertexStyle.entrySet()) {
+					new mxStyleUtils();
+					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+							e.getValue().toString());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -234,22 +180,21 @@ public class Graph extends JScrollPane implements Runnable {
 		jgxAdapter.getModel().beginUpdate();
 		try {
 			Object[] cells = { (Object) edgeToCellMap.get(this.graph.getEdge(startVertex, targetVertex)) };
+			Map<Object, Object> edgeStyle = null;
 			switch (mode) {
 			case 0: {
-				for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
-					new mxStyleUtils();
-					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-							e.getValue().toString());
-				}
+				edgeStyle = CellStyle.edgeAfterStyle;
 				break;
 			}
 			case 1: {
-				for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
-					new mxStyleUtils();
-					mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
-							e.getValue().toString());
-				}
+				edgeStyle = CellStyle.edgeDefaultStyle;
+				break;
 			}
+			}
+			for (Map.Entry<Object, Object> e : edgeStyle.entrySet()) {
+				new mxStyleUtils();
+				mxStyleUtils.setCellStyles(jgxAdapter.getModel(), cells, e.getKey().toString(),
+						e.getValue().toString());
 			}
 
 		} finally {
@@ -282,13 +227,13 @@ public class Graph extends JScrollPane implements Runnable {
 				edgeList.add(c);
 			}
 		}
-		for (Map.Entry<Object, Object> e : vertexDefaultStyle.entrySet()) {
+		for (Map.Entry<Object, Object> e : CellStyle.vertexDefaultStyle.entrySet()) {
 			new mxStyleUtils();
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), vertexList.toArray(), e.getKey().toString(),
 					e.getValue().toString());
 		}
 
-		for (Map.Entry<Object, Object> e : edgeDefaultStyle.entrySet()) {
+		for (Map.Entry<Object, Object> e : CellStyle.edgeDefaultStyle.entrySet()) {
 			new mxStyleUtils();
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), edgeList.toArray(), e.getKey().toString(),
 					e.getValue().toString());
@@ -300,9 +245,6 @@ public class Graph extends JScrollPane implements Runnable {
 
 	public void zoomIn(int x, int y) {
 		component.setCenterZoom(component.isCenterPage());
-//		double newX = x - component.getViewport().getSize().getWidth() / 2;
-//		double newY = y - component.getViewport().getSize().getHeight() / 2;
-
 		Point leftPoint = new Point();
 		leftPoint.setLocation(x, y);
 
@@ -312,10 +254,6 @@ public class Graph extends JScrollPane implements Runnable {
 
 	public void zoomOut(int x, int y) {
 		component.setCenterZoom(component.isCenterPage());
-
-//		double newX = x - component.getViewport().getSize().getWidth() / 2;
-//		double newY = y - component.getViewport().getSize().getHeight() / 2;
-
 		Point leftPoint = new Point();
 		leftPoint.setLocation(x, y);
 
@@ -327,7 +265,7 @@ public class Graph extends JScrollPane implements Runnable {
 		// Render into JPG b mxCellRender
 		BufferedImage image = mxCellRenderer.createBufferedImage(jgxAdapter, null, 2, Color.WHITE, true, null);
 		String str = ".\\src\\main\\java\\bobo4\\flowgraph\\asset\\images\\graph_" + numberImage + ".jpg";
-		Graph.numberImage += 1;
+		
 		File imgFile = new File(str);
 		try {
 			ImageIO.write(image, "JPG", imgFile);
@@ -336,8 +274,10 @@ public class Graph extends JScrollPane implements Runnable {
 		}
 		if (isNotify)
 			JOptionPane.showMessageDialog(null,
-					"Save graph as image graph_" + numberImage + ".jpg in asset/images folder", "Notice",
-					JOptionPane.INFORMATION_MESSAGE);
+					"Save graph as image graph_" + numberImage + ".jpg at folder\n"
+							+ "./src/main/java/bobo4/flowgraph/asset/images",
+					"Notice", JOptionPane.INFORMATION_MESSAGE);
+		Graph.numberImage += 1;
 
 	}
 
@@ -356,23 +296,19 @@ public class Graph extends JScrollPane implements Runnable {
 		// Beginning update jgxGraph model here
 		jgxAdapter.getModel().beginUpdate();
 		// Paint Edge here
-		for (Map.Entry<Object, Object> e : edgeAfterStyle.entrySet()) {
+		for (Map.Entry<Object, Object> e : CellStyle.edgeAfterStyle.entrySet()) {
 			new mxStyleUtils();
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), edges.toArray(), e.getKey().toString(),
 					e.getValue().toString());
 		}
 		// Paint node here
-		for (Map.Entry<Object, Object> e : vertexAfterStyle.entrySet()) {
+		for (Map.Entry<Object, Object> e : CellStyle.vertexAfterStyle.entrySet()) {
 			new mxStyleUtils();
 			mxStyleUtils.setCellStyles(jgxAdapter.getModel(), vertices.toArray(), e.getKey().toString(),
 					e.getValue().toString());
 		}
 		jgxAdapter.getModel().endUpdate();
 
-	}
-
-	public String getLastNode() {
-		return Integer.toString(graph.vertexSet().size());
 	}
 
 	// Inner class to solve mouse listener
@@ -430,11 +366,5 @@ public class Graph extends JScrollPane implements Runnable {
 
 		}
 
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		this.init();
 	}
 }

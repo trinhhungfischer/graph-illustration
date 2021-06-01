@@ -3,13 +3,11 @@ package bobo4.flowgraph.gui;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.jgrapht.alg.shortestpath.AllDirectedPaths;
-
-public class FileChooser {
+public class GUIFileChooser {
 
 	public static String DirectoryPath;
-	
-	public FileChooser() {
+
+	public GUIFileChooser() {
 		JFileChooser file = new JFileChooser();
 		String str = null;
 		file.setMultiSelectionEnabled(true);
@@ -19,11 +17,10 @@ public class FileChooser {
 			java.io.File f = file.getSelectedFile();
 			str = f.getPath();
 		}
-		FileChooser.DirectoryPath = str;
+		GUIFileChooser.DirectoryPath = str;
 
-		if (FileChooser.DirectoryPath == null) {
+		if (GUIFileChooser.DirectoryPath == null) {
 			JOptionPane.showMessageDialog(null, "You need choose one file", "Warning", JOptionPane.WARNING_MESSAGE);
-			
 		}
-	}	
+	}
 }

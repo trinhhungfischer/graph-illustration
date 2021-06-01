@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.ImageObserver;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,12 +29,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.BadLocationException;
 
 import bobo4.flowgraph.elements.Graph;
-import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.utils.GraphIllustrate;
 
 public class GUIGraphIllustration extends JFrame {
@@ -148,7 +145,7 @@ public class GUIGraphIllustration extends JFrame {
 		panelHEAD.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panelHEAD, BorderLayout.NORTH);
 
-		final JButton btnSTART = new JButton("START");
+		final JButton btnSTART = new JButton("INPUT START NODE");
 		btnSTART.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
@@ -169,7 +166,6 @@ public class GUIGraphIllustration extends JFrame {
 
 				if (!(textFieldStart.getText().equals(""))) {
 					nodeStart = textFieldStart.getText();
-					System.out.print(nodeStart);
 				} else {
 					nodeStart = JOptionPane.showInputDialog(null, "Input your start node", "Input",
 							JOptionPane.QUESTION_MESSAGE);
@@ -180,7 +176,8 @@ public class GUIGraphIllustration extends JFrame {
 			}
 		});
 		btnSTART.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		panelHEAD.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+		FlowLayout fl_panelHEAD = new FlowLayout(FlowLayout.CENTER, 15, 10);
+		panelHEAD.setLayout(fl_panelHEAD);
 		panelHEAD.add(btnSTART);
 
 		final JButton btnNEXT = new JButton("NEXT");
@@ -224,7 +221,7 @@ public class GUIGraphIllustration extends JFrame {
 		panelHEAD.add(textFieldStart);
 		textFieldStart.setColumns(3);
 
-		final JButton btnEND = new JButton("END");
+		final JButton btnEND = new JButton("INPUT END NODE");
 		btnEND.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
@@ -274,6 +271,23 @@ public class GUIGraphIllustration extends JFrame {
 				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG);
 			}
 		});
+		
+		JButton btnAUTONEXT = new JButton("AUTO NEXT");
+		btnAUTONEXT.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnRESET, "Reset graph to default state", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+				GUIGraphIllustration.hasTimerTask = true;
+				btnPAUSE.setIcon(PauseImage);
+				GraphManager.AutoNextNode(choice, lblNewLabel, txtPATHLOG);
+			}
+		});
+		btnAUTONEXT.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		panelHEAD.add(btnAUTONEXT);
 		btnRESET.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnRESET);
 
@@ -314,7 +328,7 @@ public class GUIGraphIllustration extends JFrame {
 					isQuestion[0] = 0;
 				}
 
-				GraphManager.ListNextNode(txtPATHLOG);
+				GraphManager.ListNextNode(txtPATHLOG, choice, lblNewLabel);;
 			}
 		});
 
@@ -506,7 +520,6 @@ public class GUIGraphIllustration extends JFrame {
 					isQuestion[0] = 0;
 				}
 				GraphManager.SpeedDown();
-
 			}
 		});
 		panelLEFTBUTTON.add(btnSPEEDDOWN);

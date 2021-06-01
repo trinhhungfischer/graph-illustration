@@ -29,7 +29,7 @@ public class FindPath {
 
 	public FindPath(String startNode, String endNode) {
 		this.graph = ReadGraph.getGraph();
-		listPath.clear();
+		listPath.clear();		
 		YenKShortestPath<String, FlowEdge> somePath = new YenKShortestPath<>(this.graph);
 		if (endNode.equals("")) {
 			String lastNode = Integer.toString(graph.vertexSet().size());
@@ -38,7 +38,7 @@ public class FindPath {
 			FindPath.listPath = somePath.getPaths(startNode, endNode, 10);
 		}
 	}
-
+	
 	public ListenableGraph<String, FlowEdge> getGraph() {
 		return graph;
 	}

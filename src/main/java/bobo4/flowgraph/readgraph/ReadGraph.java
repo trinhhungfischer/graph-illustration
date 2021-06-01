@@ -26,6 +26,8 @@ public class ReadGraph {
 
 	public ReadGraph(String DirectoryPath) {
 		try {
+			ReadGraph.graph = new DefaultListenableGraph<>(new DefaultDirectedGraph<String, FlowEdge>(FlowEdge.class));
+
 			boolean[] isInGraph = new boolean[2000];
 			// Need to improve that can get current file of App and read graph txt
 			File graphFile = new File(DirectoryPath);
