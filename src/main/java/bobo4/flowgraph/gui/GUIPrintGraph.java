@@ -1,9 +1,8 @@
-package bobo4.flowgraph.utils;
+package bobo4.flowgraph.gui;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -12,11 +11,33 @@ import javax.swing.JFrame;
 
 import bobo4.flowgraph.elements.Graph;
 
-public class PrintGraph extends JFrame {
+public class GUIPrintGraph extends JFrame {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
-	public PrintGraph() {
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GUIPrintGraph frame = new GUIPrintGraph();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public GUIPrintGraph() {
 		// TODO Auto-generated constructor stub
 		setTitle("Graph Path Demo");
 		setForeground(Color.LIGHT_GRAY);
@@ -36,10 +57,6 @@ public class PrintGraph extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				setVisible(false);
-			}
-		});
-		btnRETURN.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		btnRETURN.setBounds(10, 34, 108, 71);

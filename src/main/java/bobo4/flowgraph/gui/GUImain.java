@@ -1,13 +1,10 @@
 package bobo4.flowgraph.gui;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.*;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,15 +14,9 @@ import javax.swing.SwingConstants;
 
 import bobo4.flowgraph.readgraph.ReadGraph;
 import bobo4.flowgraph.utils.FindPath;
-import bobo4.flowgraph.utils.GraphIllustrate;
-import bobo4.flowgraph.utils.PrintGraph;
-
-import java.awt.GridLayout;
 
 public class GUImain extends JFrame {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private JPanel optionPanel;
 	private JPanel groupInfoPanel;
@@ -38,11 +29,10 @@ public class GUImain extends JFrame {
 		this.setSize(1024, 600);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationByPlatform(true);
-
-		while (FileChooser.DirectoryPath == null) {
-			new FileChooser();
+		while (GUIFileChooser.DirectoryPath == null) {
+			new GUIFileChooser();
 		}
-		new ReadGraph(FileChooser.DirectoryPath);
+		new ReadGraph(GUIFileChooser.DirectoryPath);
 
 		initGroupInfo();
 		initOption();
@@ -75,8 +65,7 @@ public class GUImain extends JFrame {
 	private void initButtonPrintGraph() {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: add action
-				PrintGraph graph = new PrintGraph();
+				GUIPrintGraph graph = new GUIPrintGraph();
 				graph.setVisible(true);
 			}
 		};
@@ -94,8 +83,7 @@ public class GUImain extends JFrame {
 	private void initButtonPrintPath() {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: add action
-				FindPath path = new FindPath("1", "6");
+				FindPath path = new FindPath("1", "");
 				path.print();
 			}
 		};
@@ -112,7 +100,6 @@ public class GUImain extends JFrame {
 	private void initButtonSimulationPath() {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: add action
 				try {
 					GUIGraphIllustration illustration = new GUIGraphIllustration();
 					illustration.setVisible(true);
@@ -134,11 +121,10 @@ public class GUImain extends JFrame {
 	private void initButtonReadGraph() {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: add action
 				do {
-					new FileChooser();
-				} while (FileChooser.DirectoryPath == null);
-				new ReadGraph(FileChooser.DirectoryPath);
+					new GUIFileChooser();
+				} while (GUIFileChooser.DirectoryPath == null);
+				new ReadGraph(GUIFileChooser.DirectoryPath);
 			}
 		};
 
