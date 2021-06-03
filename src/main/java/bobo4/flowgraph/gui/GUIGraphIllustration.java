@@ -1,6 +1,7 @@
 package bobo4.flowgraph.gui;
 
 import java.awt.BorderLayout;
+
 import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,7 +54,6 @@ public class GUIGraphIllustration extends JFrame {
 	private JLabel lblNewLabel;
 	private JTextField textFieldEnd;
 	private JPanel panelGRAPH;
-
 	public static boolean hasTimerTask = false;
 	private JButton btnPAUSE;
 
@@ -179,7 +179,7 @@ public class GUIGraphIllustration extends JFrame {
 		FlowLayout fl_panelHEAD = new FlowLayout(FlowLayout.CENTER, 15, 10);
 		panelHEAD.setLayout(fl_panelHEAD);
 		panelHEAD.add(btnSTART);
-
+		
 		final JButton btnNEXT = new JButton("NEXT");
 		btnNEXT.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -230,10 +230,13 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-
-				String nodeEnd = JOptionPane.showInputDialog(null, "Input your start node", "Input",
+				String nodeEnd;
+				if(!textFieldEnd.getText().equals("")) {
+				nodeEnd = textFieldEnd.getText();
+				} else {
+			     nodeEnd = JOptionPane.showInputDialog(null, "Input your end node", "Input",
 						JOptionPane.QUESTION_MESSAGE);
-				textFieldEnd.setText(nodeEnd);
+				textFieldEnd.setText(nodeEnd);}
 			}
 		});
 		btnEND.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -268,7 +271,7 @@ public class GUIGraphIllustration extends JFrame {
 				}
 				btnPAUSE.setIcon(PauseImage);
 				hasTimerTask = false;
-				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG);
+				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG, textFieldStart, textFieldEnd);
 			}
 		});
 		

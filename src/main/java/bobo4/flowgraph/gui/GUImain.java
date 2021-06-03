@@ -83,8 +83,11 @@ public class GUImain extends JFrame {
 	private void initButtonPrintPath() {
 		ActionListener action = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FindPath path = new FindPath("1", "");
-				path.print();
+				try{GUIPrintPath printPath = new GUIPrintPath();
+				printPath.setVisible(true);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		};
 
