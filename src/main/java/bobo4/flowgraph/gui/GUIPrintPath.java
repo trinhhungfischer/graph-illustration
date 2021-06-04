@@ -42,13 +42,19 @@ import bobo4.flowgraph.elements.Graph;
 import bobo4.flowgraph.exception.WrongVertexException;
 import bobo4.flowgraph.utils.GraphIllustrate;
 import bobo4.flowgraph.utils.FindPath;
-public class GUIPrintPath extends JFrame{
+
+public class GUIPrintPath extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private final Dimension DEFAULT_SIZE = new Dimension(1600, 900);
 
 	private JTextField textFieldStart;
 	private JButton btnQUESTION;
 	private Graph graph = new Graph();
-//	private JLabel lblNewLabel;
+
 	private JTextField textFieldEnd;
 	private JPanel panelGRAPH;
 	private JButton btnPrintPath;
@@ -70,10 +76,11 @@ public class GUIPrintPath extends JFrame{
 			}
 		});
 	}
+
 	public GUIPrintPath() {
 		setBackground(Color.LIGHT_GRAY);
 
-		//final GraphIllustrate GraphManager = new GraphIllustrate(graphScrollPanel);
+		// final GraphIllustrate GraphManager = new GraphIllustrate(graphScrollPanel);
 
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
@@ -81,10 +88,11 @@ public class GUIPrintPath extends JFrame{
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 1500, 900);
 		setSize(DEFAULT_SIZE);
-		
+
 		final int[] isQuestion = { 0 };
 
-		Image image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/question.png")).getImage();
+		Image image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/question.png"))
+				.getImage();
 		Image newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
 		ImageIcon QuestionImage = new ImageIcon(newImg);
@@ -94,18 +102,16 @@ public class GUIPrintPath extends JFrame{
 				java.awt.Image.SCALE_SMOOTH);
 		ImageIcon SaveImage = new ImageIcon(newImg);
 
-		
-		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/speed-up.png")).getImage();
+		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/next_path.png")).getImage();
 		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
 		ImageIcon NextImage = new ImageIcon(newImg);
 
-		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/speed-down.png")).getImage();
+		image = new ImageIcon(GraphIllustrate.class.getResource("/bobo4/flowgraph/asset/previous_path.png")).getImage();
 		newImg = image.getScaledInstance(ImageObserver.WIDTH * 30, ImageObserver.HEIGHT * 20,
 				java.awt.Image.SCALE_SMOOTH);
 		ImageIcon BackImage = new ImageIcon(newImg);
-		
-		
+
 		getContentPane().setLayout(new BorderLayout(10, 10));
 
 		JPanel panelHEAD = new JPanel();
@@ -136,7 +142,7 @@ public class GUIPrintPath extends JFrame{
 		FlowLayout fl_panelHEAD = new FlowLayout(FlowLayout.CENTER, 15, 10);
 		panelHEAD.setLayout(fl_panelHEAD);
 		panelHEAD.add(btnSTART);
-		
+
 		textFieldStart = new JTextField();
 		textFieldStart.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		textFieldStart.addMouseListener(new MouseAdapter() {
@@ -155,7 +161,7 @@ public class GUIPrintPath extends JFrame{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					String nodeStart = textFieldStart.getText();
+					nodeStart = textFieldStart.getText();
 				}
 			}
 		});
@@ -171,12 +177,13 @@ public class GUIPrintPath extends JFrame{
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				if(!textFieldEnd.getText().equals("")) {
-				nodeEnd = textFieldEnd.getText();
+				if (!textFieldEnd.getText().equals("")) {
+					nodeEnd = textFieldEnd.getText();
 				} else {
-			     nodeEnd = JOptionPane.showInputDialog(null, "Input your end node", "Input",
-						JOptionPane.QUESTION_MESSAGE);
-				textFieldEnd.setText(nodeEnd);}
+					nodeEnd = JOptionPane.showInputDialog(null, "Input your end node", "Input",
+							JOptionPane.QUESTION_MESSAGE);
+					textFieldEnd.setText(nodeEnd);
+				}
 			}
 		});
 		btnEND.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -195,44 +202,54 @@ public class GUIPrintPath extends JFrame{
 
 			}
 		});
+		textFieldEnd.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					nodeEnd = textFieldEnd.getText();
+				}
+			}
+		});
+
 		textFieldEnd.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(textFieldEnd);
 		textFieldEnd.setColumns(3);
-		
+
 		btnPrintPath = new JButton("Print Path");
-		
+
 		btnPrintPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnPrintPath, "Print Path", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(btnPrintPath, "Print Path", "Instruction", JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				if(!nodeStart.equals("")&&!nodeEnd.equals("")) {
-					FindPath hoang = new FindPath(nodeStart, nodeEnd);
-					listPath = hoang.getListPath();
-					if(listPath.size()== 0) JOptionPane.showMessageDialog(null, "No Path", "All Path", JOptionPane.INFORMATION_MESSAGE);
+				if (!nodeStart.equals("") && !nodeEnd.equals("")) {
+					new FindPath(nodeStart, nodeEnd);
+					listPath = FindPath.getListPath();
+					if (listPath.size() == 0)
+						JOptionPane.showMessageDialog(null, "No Path", "All Path", JOptionPane.INFORMATION_MESSAGE);
 					else {
-						    String  strPath = "";
-						    strPath += nodeStart;
-						    
-							for (FlowEdge edge : listPath.get(0).getEdgeList()) {
-								strPath+= " => " + edge.getTarget();
-							}
-							graph.paintPath(listPath.get(0));
+						String strPath = "";
+						strPath += nodeStart;
+
+						for (FlowEdge edge : listPath.get(0).getEdgeList()) {
+							strPath += " => " + edge.getTarget();
+						}
+						graph.paintPath(listPath.get(0));
 						JOptionPane.showMessageDialog(null, strPath, " Path", JOptionPane.INFORMATION_MESSAGE);
 						currentPath = 1;
-						
+
 					}
+
 				}
 			}
 		});
 		btnPrintPath.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnPrintPath);
-		
-        btnPrintAllPath = new JButton("Print All Path");
-		
+
+		btnPrintAllPath = new JButton("Print All Path");
+
 		btnPrintAllPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
@@ -241,7 +258,7 @@ public class GUIPrintPath extends JFrame{
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				if(!nodeStart.equals("")&&!nodeEnd.equals("")) {
+				if (!nodeStart.equals("") && !nodeEnd.equals("")) {
 					FindPath hoang = new FindPath(nodeStart, nodeEnd);
 					hoang.print();
 				}
@@ -249,7 +266,7 @@ public class GUIPrintPath extends JFrame{
 		});
 		btnPrintAllPath.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnPrintAllPath);
-		
+
 		final JButton btnRESET = new JButton("RESET");
 		btnRESET.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -264,12 +281,11 @@ public class GUIPrintPath extends JFrame{
 		});
 		btnRESET.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnRESET);
-		
+
 		JPanel panelLEFTBUTTON = new JPanel();
 		panelLEFTBUTTON.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panelLEFTBUTTON, BorderLayout.EAST);
 		panelLEFTBUTTON.setLayout(new GridLayout(0, 1, 0, 0));
-		
 
 		btnQUESTION = new JButton();
 		btnQUESTION.addActionListener(new ActionListener() {
@@ -293,31 +309,30 @@ public class GUIPrintPath extends JFrame{
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				
+
 				graph.saveImage(true);
 			}
 		});
 		btnSAVE.setIcon(SaveImage);
-		
+
 		final JButton btnNEXT = new JButton();
 		btnNEXT.setBackground(Color.LIGHT_GRAY);
 		btnNEXT.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnNEXT, "Next Path", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(btnNEXT, "Next Path", "Instruction", JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				if(currentPath < listPath.size()) {
-			            currentPath++;
-					    String  strPath = "";
-					    strPath += nodeStart;
-					    graph.init();
-						for (FlowEdge edge : listPath.get(currentPath - 1).getEdgeList()) {
-							strPath+= " => " + edge.getTarget();
-						}
-						graph.paintPath(listPath.get(currentPath -1));
+				if (currentPath < listPath.size()) {
+					currentPath++;
+					String strPath = "";
+					strPath += nodeStart;
+					graph.repaintGraph();
+					for (FlowEdge edge : listPath.get(currentPath - 1).getEdgeList()) {
+						strPath += " => " + edge.getTarget();
+					}
+					graph.paintPath(listPath.get(currentPath - 1));
 					JOptionPane.showMessageDialog(null, strPath, " Path", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
@@ -331,34 +346,33 @@ public class GUIPrintPath extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				if (isQuestion[0] == 1) {
 					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnBACK, "Previou Path", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(btnBACK, "Previou Path", "Instruction", JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-				if(currentPath > 1) {
-		            currentPath--;
-				    String  strPath = "";
-				    strPath += nodeStart;
-				    graph.init();
-					for (FlowEdge edge : listPath.get(currentPath -1 ).getEdgeList()) {
-						strPath+= " => " + edge.getTarget();
+				if (currentPath > 1) {
+					currentPath--;
+					String strPath = "";
+					strPath += nodeStart;
+					graph.repaintGraph();
+					for (FlowEdge edge : listPath.get(currentPath - 1).getEdgeList()) {
+						strPath += " => " + edge.getTarget();
 					}
-					graph.paintPath(listPath.get(currentPath -1));
-				JOptionPane.showMessageDialog(null, strPath, "Previous Path", JOptionPane.INFORMATION_MESSAGE);
-			}
+					graph.paintPath(listPath.get(currentPath - 1));
+					JOptionPane.showMessageDialog(null, strPath, "Previous Path", JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		});
 		panelLEFTBUTTON.add(btnBACK);
 		btnBACK.setIcon(BackImage);
 
-		
 		panelGRAPH = new JPanel();
 		panelGRAPH.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panelGRAPH, BorderLayout.CENTER);
 		panelGRAPH.setLayout(new BorderLayout(0, 0));
 		panelGRAPH.add(graph);
-		
+
 	}
+
 	public void reset() {
 		nodeStart = "";
 		nodeEnd = "";
@@ -368,5 +382,5 @@ public class GUIPrintPath extends JFrame{
 		textFieldEnd.setText("");
 		listPath.clear();
 	}
-		
+
 }
