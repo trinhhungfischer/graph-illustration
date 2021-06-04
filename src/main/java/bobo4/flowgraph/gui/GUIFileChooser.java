@@ -13,8 +13,9 @@ public class GUIFileChooser {
 		file.setMultiSelectionEnabled(true);
 		file.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		file.setFileHidingEnabled(false);
+		
 		if (file.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			java.io.File f = file.getSelectedFile();
+		    java.io.File f = file.getSelectedFile();
 			str = f.getPath();
 		}
 		GUIFileChooser.DirectoryPath = str;

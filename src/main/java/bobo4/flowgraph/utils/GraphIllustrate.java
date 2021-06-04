@@ -11,6 +11,7 @@ import java.util.Stack;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 
@@ -58,13 +59,15 @@ public class GraphIllustrate {
 		}
 	}
 
-	public void Reset(Choice choice, JLabel myLabel, JTextArea txtPATHLOG) {
+	public void Reset(Choice choice, JLabel myLabel, JTextArea txtPATHLOG, JTextField textFieldStart, JTextField textFieldEnd) {
 		isRunAuto = false;
 		isStopRunAuto = false;
 		GUIGraphIllustration.hasTimerTask = false;
 		graphIllustrate.init();
 		PathHistory.clear();
 		txtPATHLOG.setText(null);
+		textFieldStart.setText("");
+		textFieldEnd.setText("");
 		SetChoiceAndUpdate(choice, myLabel);
 	}
 
@@ -246,9 +249,10 @@ public class GraphIllustrate {
 		myLabel.setText("Current node is: None");
 		choice.removeAll();
 		choice.add("<None>");
+		if(PathHistory.size()>1)
+		graphIllustrate.init();
 		PathHistory.clear();
 		RedoStack.clear();
-
 		timer = new Timer(delayTime, new ActionListener() {
 
 			@Override

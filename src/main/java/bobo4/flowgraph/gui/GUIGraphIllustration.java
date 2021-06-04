@@ -1,6 +1,7 @@
 package bobo4.flowgraph.gui;
 
 import java.awt.BorderLayout;
+
 import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,7 +54,6 @@ public class GUIGraphIllustration extends JFrame {
 	private JLabel lblNewLabel;
 	private JTextField textFieldEnd;
 	private JPanel panelGRAPH;
-
 	public static boolean hasTimerTask = false;
 	private JButton btnPAUSE;
 
@@ -180,21 +180,6 @@ public class GUIGraphIllustration extends JFrame {
 		panelHEAD.setLayout(fl_panelHEAD);
 		panelHEAD.add(btnSTART);
 
-		final JButton btnNEXT = new JButton("NEXT");
-		btnNEXT.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (isQuestion[0] == 1) {
-					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnNEXT, "Random walk to next node", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
-					isQuestion[0] = 0;
-				}
-
-				GraphManager.Next(choice, lblNewLabel, txtPATHLOG);
-			}
-		});
-		btnNEXT.setFont(new Font("Tahoma", Font.PLAIN, 18));
-
 		textFieldStart = new JTextField();
 		textFieldStart.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		textFieldStart.addMouseListener(new MouseAdapter() {
@@ -230,10 +215,13 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
-
-				String nodeEnd = JOptionPane.showInputDialog(null, "Input your start node", "Input",
+				String nodeEnd;
+				if(!textFieldEnd.getText().equals("")) {
+				nodeEnd = textFieldEnd.getText();
+				} else {
+			     nodeEnd = JOptionPane.showInputDialog(null, "Input your end node", "Input",
 						JOptionPane.QUESTION_MESSAGE);
-				textFieldEnd.setText(nodeEnd);
+				textFieldEnd.setText(nodeEnd);}
 			}
 		});
 		btnEND.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -255,7 +243,6 @@ public class GUIGraphIllustration extends JFrame {
 		textFieldEnd.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(textFieldEnd);
 		textFieldEnd.setColumns(3);
-		panelHEAD.add(btnNEXT);
 
 		final JButton btnRESET = new JButton("RESET");
 		btnRESET.addActionListener(new ActionListener() {
@@ -266,28 +253,13 @@ public class GUIGraphIllustration extends JFrame {
 							JOptionPane.PLAIN_MESSAGE);
 					isQuestion[0] = 0;
 				}
+				textFieldEnd.setText("");
+				textFieldStart.setText("");
 				btnPAUSE.setIcon(PauseImage);
 				hasTimerTask = false;
-				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG);
+				GraphManager.Reset(choice, lblNewLabel, txtPATHLOG, textFieldStart, textFieldEnd);
 			}
 		});
-		
-		JButton btnAUTONEXT = new JButton("AUTO NEXT");
-		btnAUTONEXT.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (isQuestion[0] == 1) {
-					btnQUESTION.setBackground(Color.LIGHT_GRAY);
-					JOptionPane.showMessageDialog(btnRESET, "Reset graph to default state", "Instruction",
-							JOptionPane.PLAIN_MESSAGE);
-					isQuestion[0] = 0;
-				}
-				GUIGraphIllustration.hasTimerTask = true;
-				btnPAUSE.setIcon(PauseImage);
-				GraphManager.AutoNextNode(choice, lblNewLabel, txtPATHLOG);
-			}
-		});
-		btnAUTONEXT.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		panelHEAD.add(btnAUTONEXT);
 		btnRESET.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnRESET);
 
@@ -351,6 +323,39 @@ public class GUIGraphIllustration extends JFrame {
 
 			}
 		});
+		
+		JButton btnAUTONEXT = new JButton("AUTO NEXT");
+		btnAUTONEXT.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnRESET, "Reset graph to default state", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+				GUIGraphIllustration.hasTimerTask = true;
+				btnPAUSE.setIcon(PauseImage);
+				GraphManager.AutoNextNode(choice, lblNewLabel, txtPATHLOG);
+			}
+		});
+		
+		final JButton btnNEXT = new JButton("NEXT");
+		btnNEXT.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (isQuestion[0] == 1) {
+					btnQUESTION.setBackground(Color.LIGHT_GRAY);
+					JOptionPane.showMessageDialog(btnNEXT, "Random walk to next node", "Instruction",
+							JOptionPane.PLAIN_MESSAGE);
+					isQuestion[0] = 0;
+				}
+
+				GraphManager.Next(choice, lblNewLabel, txtPATHLOG);
+			}
+		});
+		btnNEXT.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		panelHEAD.add(btnNEXT);
+		btnAUTONEXT.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		panelHEAD.add(btnAUTONEXT);
 		btnAUTO.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		panelHEAD.add(btnAUTO);
 

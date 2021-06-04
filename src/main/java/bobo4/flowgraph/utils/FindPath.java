@@ -1,11 +1,12 @@
 package bobo4.flowgraph.utils;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
-
+import javax.swing.JFrame;
 import org.jgrapht.GraphPath;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -26,7 +27,6 @@ public class FindPath {
 	public static void setListPath(List<GraphPath<String, FlowEdge>> listPath) {
 		FindPath.listPath = listPath;
 	}
-
 	public FindPath(String startNode, String endNode) {
 		this.graph = ReadGraph.getGraph();
 		listPath.clear();		
