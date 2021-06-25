@@ -1,8 +1,6 @@
 package bobo4.flowgraph.gui;
 
 import java.awt.BorderLayout;
-
-import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -12,8 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -25,23 +21,18 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.JOptionPane;
+
 import org.jgrapht.GraphPath;
 
 import bobo4.flowgraph.elements.FlowEdge;
 import bobo4.flowgraph.elements.Graph;
-import bobo4.flowgraph.exception.WrongVertexException;
-import bobo4.flowgraph.utils.GraphIllustrate;
 import bobo4.flowgraph.utils.FindPath;
+import bobo4.flowgraph.utils.GraphIllustrate;
 
 public class GUIPrintPath extends JFrame {
 	/**
@@ -79,9 +70,6 @@ public class GUIPrintPath extends JFrame {
 
 	public GUIPrintPath() {
 		setBackground(Color.LIGHT_GRAY);
-
-		// final GraphIllustrate GraphManager = new GraphIllustrate(graphScrollPanel);
-
 		setForeground(Color.LIGHT_GRAY);
 		setFont(new Font("Arial", Font.PLAIN, 14));
 		setTitle("Print Path");

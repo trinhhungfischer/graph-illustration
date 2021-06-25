@@ -1,12 +1,11 @@
 package bobo4.flowgraph.utils;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
-import javax.swing.JFrame;
+
 import org.jgrapht.GraphPath;
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.alg.shortestpath.YenKShortestPath;
@@ -27,18 +26,21 @@ public class FindPath {
 	public static void setListPath(List<GraphPath<String, FlowEdge>> listPath) {
 		FindPath.listPath = listPath;
 	}
+
 	public FindPath(String startNode, String endNode) {
 		this.graph = ReadGraph.getGraph();
-		listPath.clear();		
+		listPath.clear();
 		YenKShortestPath<String, FlowEdge> somePath = new YenKShortestPath<>(this.graph);
-		if (endNode.equals("")) {
+		if (startNode.equals(""))
+			JOptionPane.showMessageDialog(null, "There's no start node", "Alert", JOptionPane.ERROR_MESSAGE);
+		else if (endNode.equals("")) {
 			String lastNode = Integer.toString(graph.vertexSet().size());
 			FindPath.listPath = somePath.getPaths(startNode, lastNode, 10);
 		} else {
 			FindPath.listPath = somePath.getPaths(startNode, endNode, 10);
 		}
 	}
-	
+
 	public ListenableGraph<String, FlowEdge> getGraph() {
 		return graph;
 	}
@@ -62,7 +64,7 @@ public class FindPath {
 				try {
 					myGraph.paintNode("1", 0);
 				} catch (WrongVertexException e) {
-						e.printStackTrace();
+					e.printStackTrace();
 				}
 				for (FlowEdge edge : listPath.get(i).getEdgeList()) {
 					strPath[i] += " => " + edge.getTarget();
